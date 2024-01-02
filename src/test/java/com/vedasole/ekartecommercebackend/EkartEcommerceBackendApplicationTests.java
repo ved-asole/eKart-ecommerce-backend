@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EkartEcommerceBackendApplicationTests {
 
     @Autowired
-    EkartEcommerceBackendApplication application = new EkartEcommerceBackendApplication();
+    EkartEcommerceBackendApplication application;
 
     @Test
     void contextLoads() {
