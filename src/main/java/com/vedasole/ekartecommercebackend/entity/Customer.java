@@ -6,12 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +16,7 @@ import java.util.HashSet;
 @Validated
 @Entity
 @Table(name = "customer")
-public class Customer implements UserDetails {
+public class Customer {
 
     @Id
     @Column(updatable = false)
@@ -38,39 +34,4 @@ public class Customer implements UserDetails {
     @OneToOne
     @JoinColumn(name = "address_id")
     private Address address;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new HashSet<>();
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
 }
