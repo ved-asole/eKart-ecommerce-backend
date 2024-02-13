@@ -1,8 +1,6 @@
 package com.vedasole.ekartecommercebackend.payload;
 
 import com.vedasole.ekartecommercebackend.entity.ShoppingCartItem;
-import com.vedasole.ekartecommercebackend.payload.ProductDto;
-import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
 import javax.validation.constraints.NotNull;
 
 import java.io.Serial;
