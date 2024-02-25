@@ -1,6 +1,6 @@
 # Ekart - An E-commerce Backend API
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ved-asole_eKart-ecommerce-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ved-asole_eKart-ecommerce-backend)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ved-asole_eKart-ecommerce-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ved-asole_eKart-ecommerce-backend) [![Qodana](https://github.com/ved-asole/eKart-ecommerce-backend/actions/workflows/qodana.yml/badge.svg)](https://github.com/ved-asole/eKart-ecommerce-backend/actions/workflows/qodana.yml)
 
 # Live Link / Demo Link: 🔗
 Access my site at **[ekart.vedasole.cloud](https://ekart.vedasole.cloud)**
