@@ -1,13 +1,27 @@
 package com.vedasole.ekartecommercebackend.payload;
 
+import com.vedasole.ekartecommercebackend.entity.Category;
+import lombok.*;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
- * DTO for {@link com.vedasole.ekartecommercebackend.entity.Category}
+ * DTO for {@link Category}
  */
-public record CategoryDto(long categoryId, String name, String image, String desc,
-                          long parentCategory, boolean isActive) implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class CategoryDto implements Serializable {
+
     @Serial
     private static final long serialVersionUID = -6361844320830928689L;
+    private long categoryId;
+    private String name;
+    private String image;
+    private String desc;
+    private Category parentCategory;
+    private boolean active;
+
 }
