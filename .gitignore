@@ -33,3 +33,4 @@ build/
 
 ### VS Code ###
 .vscode/
+.github/workflows/qodana.yml
