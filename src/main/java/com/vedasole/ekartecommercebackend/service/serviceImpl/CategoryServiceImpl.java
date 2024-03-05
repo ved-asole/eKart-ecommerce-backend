@@ -20,12 +20,25 @@ public class CategoryServiceImpl implements CategoryService {
         this.modelMapper = modelMapper;
     }
 
+        /**
+     * Creates a new Category record in the database and returns the CategoryDTO representation of the newly created record.
+     *
+     * @param categoryDto the CategoryDTO representation of the Category record to be created
+     * @return the CategoryDTO representation of the newly created Category record
+     */
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
         Category addedCategory = this.categoryRepo.save(dtoToCategory(categoryDto));
         return categoryToDto(addedCategory);
     }
 
+        /**
+     * Updates an existing Category record in the database and returns the CategoryDTO representation of the updated record.
+     *
+     * @param categoryDto the CategoryDTO representation of the updated Category record
+     * @param categoryId the unique identifier of the Category record to be updated
+     * @return the CategoryDTO representation of the updated Category record
+     */
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
         Category category = dtoToCategory(categoryDto);
@@ -44,6 +57,11 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryToDto(categoryInDB);
     }
 
+    /**
+     * Returns a list of all categories in the database as CategoryDTOs.
+     *
+     * @return a list of all categories in the database as CategoryDTOs
+     */
     @Override
     public List<CategoryDto> getAllCategories() {
         return this.categoryRepo.findAll().stream()
@@ -51,18 +69,30 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
+    /**
+     * Returns the CategoryDTO representation of the Category record with the specified id.
+     *
+     * @param categoryId the unique identifier of the Category record to be retrieved
+     * @return the CategoryDTO representation of the Category record with the specified id
+     * @throws ResourceNotFoundException if the Category record with the specified id is not found
+     */
     @Override
-    public CategoryDto getCategoryById(Long categoryId) {
-        Category category = this.categoryRepo.findById(categoryId).
-                orElseThrow(() -> new ResourceNotFoundException(
-                        "Category", "id" , categoryId));
-
-        return categoryToDto(category);
+    public CategoryDto getCategoryById(Long categoryId) throws ResourceNotFoundException {
+        return categoryToDto(
+                this.categoryRepo.findById(categoryId)
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Category", "id", categoryId)));
     }
 
+    /**
+     * Deletes a category from the database based on the given category ID.
+     *
+     * @param categoryId the ID of the category to be deleted
+     * @return true if the category was successfully deleted, false otherwise
+     */
     @Override
     public boolean deleteCategory(Long categoryId) {
-        try{
+        try {
             this.categoryRepo.deleteById(categoryId);
             return true;
         } catch (Exception e) {

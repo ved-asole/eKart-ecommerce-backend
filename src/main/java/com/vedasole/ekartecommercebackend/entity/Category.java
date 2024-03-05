@@ -1,6 +1,8 @@
 package com.vedasole.ekartecommercebackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +18,8 @@ import java.io.Serializable;
 @Validated
 @Entity
 @Data
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown=true)
 @Table(name = "category")
 public class Category implements Serializable {
 
@@ -52,69 +56,4 @@ public class Category implements Serializable {
         this.parentCategory = parentCategory;
         this.active = active;
     }
-
-    public Category(long categoryId, String name, String image, String desc, Category parentCategory, boolean active) {
-        this.categoryId = categoryId;
-        this.name = name;
-        this.image = image;
-        this.desc = desc;
-        this.parentCategory = parentCategory;
-        this.active = active;
-    }
-//
-//    public long getCategoryId() {
-//        return categoryId;
-//    }
-//
-//    public void setCategoryId(long categoryId) {
-//        this.categoryId = categoryId;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    public String getImage() {
-//        return image;
-//    }
-//
-//    public void setImage(String image) {
-//        this.image = image;
-//    }
-//
-//    public String getDesc() {
-//        return desc;
-//    }
-//
-//    public void setDesc(String desc) {
-//        this.desc = desc;
-//    }
-//
-//    public Category getParentCategory() {
-//        return parentCategory;
-//    }
-//
-//    public void setParentCategory(Category parentCategory) {
-//        this.parentCategory = parentCategory;
-//    }
-//
-//    @Override
-//    public final boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null) return false;
-//        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-//        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-//        if (thisEffectiveClass != oEffectiveClass) return false;
-//        Category category = (Category) o;
-//        return Long.valueOf(this.getCategoryId()) != null && Objects.equals(getCategoryId(), category.getCategoryId());
-//    }
-//
-//    @Override
-//    public final int hashCode() {
-//        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
-//    }
 }

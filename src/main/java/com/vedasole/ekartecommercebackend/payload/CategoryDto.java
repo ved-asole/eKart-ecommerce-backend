@@ -2,10 +2,10 @@ package com.vedasole.ekartecommercebackend.payload;
 
 import com.vedasole.ekartecommercebackend.entity.Category;
 import lombok.*;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * DTO for {@link Category}
@@ -13,6 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Relation(itemRelation = "category", collectionRelation = "categories")
 public class CategoryDto implements Serializable {
 
     @Serial

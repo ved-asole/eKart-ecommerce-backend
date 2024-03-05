@@ -3,12 +3,19 @@ package com.vedasole.ekartecommercebackend.controller;
 import com.vedasole.ekartecommercebackend.payload.ApiResponse;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryService;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
+
+import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CATEGORIES;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Validated
 @RestController
@@ -30,10 +37,17 @@ public class CategoryController {
      * @return the created category
      */
     @PostMapping
-    public ResponseEntity<CategoryDto> createCategory(
+    public ResponseEntity<EntityModel<CategoryDto>> createCategory(
             @Valid @RequestBody CategoryDto categoryDto) {
         CategoryDto createdCategory = this.categoryService.createCategory(categoryDto);
-        return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                EntityModel.of(
+                        createdCategory,
+                        linkTo(methodOn(CategoryController.class).getCategory(createdCategory.getCategoryId())).withSelfRel(),
+                        linkTo(methodOn(CategoryController.class).getAllCategories()).withRel(CATEGORIES.getValue())
+                ),
+                HttpStatus.CREATED
+        );
     }
 
         /**
@@ -44,11 +58,17 @@ public class CategoryController {
      * @return the updated category
      */
     @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryDto> updateCategory(
+    public ResponseEntity<EntityModel<CategoryDto>> updateCategory(
             @Valid @RequestBody CategoryDto categoryDto,
             @PathVariable Long categoryId) {
         CategoryDto updatedCategory = this.categoryService.updateCategory(categoryDto, categoryId);
-        return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
+        return new ResponseEntity<>(
+                EntityModel.of(
+                        updatedCategory,
+                        linkTo(methodOn(CategoryController.class).getCategory(updatedCategory.getCategoryId())).withSelfRel()
+                ),
+                HttpStatus.OK
+        );
     }
 
         /**
@@ -75,13 +95,19 @@ public class CategoryController {
      * @return the requested category, or a 404 Not Found error if the category does not exist
      */
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryDto> getCategory(
+    public ResponseEntity<EntityModel<CategoryDto>> getCategory(
             @PathVariable Long categoryId
     ) {
         CategoryDto category = this.categoryService.getCategoryById(categoryId);
         return category == null ?
                 new ResponseEntity<>(HttpStatus.NOT_FOUND) :
-                new ResponseEntity<>(category, HttpStatus.OK);
+                new ResponseEntity<>(
+                        EntityModel.of(
+                                category,
+                                linkTo(methodOn(CategoryController.class).getCategory(category.getCategoryId())).withSelfRel()
+                        ),
+                        HttpStatus.OK
+                );
     }
 
         /**
@@ -90,10 +116,16 @@ public class CategoryController {
      * @return a list of all categories
      */
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getAllCategories(){
+    public ResponseEntity<CollectionModel<CategoryDto>> getAllCategories(){
         List<CategoryDto> allCategories = this.categoryService.
                 getAllCategories();
-        return new ResponseEntity<>(allCategories, HttpStatus.OK);
+        return new ResponseEntity<>(
+                CollectionModel.of(
+                        allCategories,
+                        linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel()
+                ),
+                HttpStatus.OK
+        );
     }
 
 }
