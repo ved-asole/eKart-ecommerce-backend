@@ -20,6 +20,8 @@ Ekart Ecommerce is an online e-commerce app which provides the facility for onli
 A backend API project for the eKart E-commerce website developed using Java and Spring Framework.
 
 # Screenshots: 📷
+<img src="https://raw.githubusercontent.com/ved-asole/eKart-ecommerce-backend/master/ekartdb-backend-ER-diagram.png" width="500" height="500" alt="Database Diagram"/>
+
 Will be added soon😊
 
 # Technologies: ☕️  ⚛️
