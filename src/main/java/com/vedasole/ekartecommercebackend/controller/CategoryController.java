@@ -22,8 +22,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Validated
 @RestController
 @RequestMapping("/api/v1/categories")
-//@CrossOrigin("http://localhost:5173")
-@CrossOrigin("*")
+//@CrossOrigin(value = ["http://localhost:5173","https://ekart.vedasole.cloud"])
+@CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
 public class CategoryController {
 
