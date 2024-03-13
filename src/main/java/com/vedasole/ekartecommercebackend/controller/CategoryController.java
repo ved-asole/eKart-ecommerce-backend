@@ -6,11 +6,13 @@ import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryServi
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CATEGORIES;
@@ -20,6 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Validated
 @RestController
 @RequestMapping("/api/v1/categories")
+//@CrossOrigin(value = ["http://localhost:5173","https://ekart.vedasole.cloud"])
 @CrossOrigin("http://localhost:5173")
 @RequiredArgsConstructor
 public class CategoryController {
@@ -36,14 +39,11 @@ public class CategoryController {
     public ResponseEntity<EntityModel<CategoryDto>> createCategory(
             @Valid @RequestBody CategoryDto categoryDto) {
         CategoryDto createdCategory = this.categoryService.createCategory(categoryDto);
-        return new ResponseEntity<>(
-                EntityModel.of(
-                        createdCategory,
-                        linkTo(methodOn(CategoryController.class).getCategory(createdCategory.getCategoryId())).withSelfRel(),
-                        linkTo(methodOn(CategoryController.class).getAllCategories()).withRel(CATEGORIES.getValue())
-                ),
-                HttpStatus.CREATED
-        );
+        Link selfLink = linkTo(methodOn(CategoryController.class).getCategory(createdCategory.getCategoryId())).withSelfRel();
+        Link categoriesLink = linkTo(methodOn(CategoryController.class).getAllCategories()).withRel(CATEGORIES.getValue());
+        return ResponseEntity
+                .created(URI.create(selfLink.getHref()))
+                .body(EntityModel.of(createdCategory, selfLink, categoriesLink));
     }
 
         /**
@@ -57,14 +57,9 @@ public class CategoryController {
     public ResponseEntity<EntityModel<CategoryDto>> updateCategory(
             @Valid @RequestBody CategoryDto categoryDto,
             @PathVariable Long categoryId) {
-        CategoryDto updatedCategory = this.categoryService.updateCategory(categoryDto, categoryId);
-        return new ResponseEntity<>(
-                EntityModel.of(
-                        updatedCategory,
-                        linkTo(methodOn(CategoryController.class).getCategory(updatedCategory.getCategoryId())).withSelfRel()
-                ),
-                HttpStatus.OK
-        );
+        CategoryDto updatedCategory = categoryService.updateCategory(categoryDto, categoryId);
+        Link selfLink = linkTo(CategoryController.class).slash(updatedCategory.getCategoryId()).withSelfRel();
+        return ResponseEntity.ok(EntityModel.of(updatedCategory, selfLink));
     }
 
         /**
@@ -76,12 +71,9 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<ApiResponse> deleteCategory(
             @PathVariable Long categoryId) {
-        this.categoryService.deleteCategory(categoryId);
-        return new ResponseEntity<>(
-                new ApiResponse(
-                        "Category deleted successfully",
-                        true),
-                HttpStatus.OK);
+        boolean deletedSuccessfully = this.categoryService.deleteCategory(categoryId);
+        if(!deletedSuccessfully) return new ResponseEntity<>(new ApiResponse("Unable to delete the cateogry", deletedSuccessfully), HttpStatus.INTERNAL_SERVER_ERROR);
+        else return ResponseEntity.ok(new ApiResponse("Customer deleted Category", deletedSuccessfully));
     }
 
         /**
@@ -95,15 +87,13 @@ public class CategoryController {
             @PathVariable Long categoryId
     ) {
         CategoryDto category = this.categoryService.getCategoryById(categoryId);
-        return category == null ?
-                new ResponseEntity<>(HttpStatus.NOT_FOUND) :
-                new ResponseEntity<>(
-                        EntityModel.of(
-                                category,
-                                linkTo(methodOn(CategoryController.class).getCategory(category.getCategoryId())).withSelfRel()
-                        ),
-                        HttpStatus.OK
-                );
+        if (category == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            Link selfLink = linkTo(CategoryController.class).slash(category.getCategoryId()).withSelfRel();
+            Link allCategoriesLink = linkTo(CategoryController.class).slash("all").withRel(CATEGORIES.getValue());
+            return ResponseEntity.ok(EntityModel.of(category, selfLink, allCategoriesLink));
+        }
     }
 
         /**
@@ -112,16 +102,11 @@ public class CategoryController {
      * @return a list of all categories
      */
     @GetMapping
-    public ResponseEntity<CollectionModel<CategoryDto>> getAllCategories(){
-        List<CategoryDto> allCategories = this.categoryService.
-                getAllCategories();
-        return new ResponseEntity<>(
-                CollectionModel.of(
-                        allCategories,
-                        linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel()
-                ),
-                HttpStatus.OK
+    public CollectionModel<CategoryDto> getAllCategories(){
+        List<CategoryDto> allCategories = this.categoryService.getAllCategories();
+        return CollectionModel.of(
+                allCategories,
+                linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel()
         );
     }
-
 }

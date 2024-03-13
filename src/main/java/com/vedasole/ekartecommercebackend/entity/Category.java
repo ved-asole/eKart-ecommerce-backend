@@ -1,13 +1,15 @@
 package com.vedasole.ekartecommercebackend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -19,6 +21,7 @@ import java.io.Serializable;
 @Entity
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown=true)
 @Table(name = "category")
 public class Category implements Serializable {
@@ -27,14 +30,17 @@ public class Category implements Serializable {
     private static final long serialVersionUID = -5392075886775352349L;
 
     @Id
-    @Column(updatable = false)
+    @Column(name = "category_id", updatable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
     @SequenceGenerator(name = "category_seq", allocationSize = 0)
     private long categoryId;
 
+    @NotNull
+    @NotBlank
     @Column(nullable = false, length = 20)
     private String name;
-
+    @NotNull
+    @NotBlank
     private String image;
 
     @Column(length = 1000)
@@ -44,16 +50,7 @@ public class Category implements Serializable {
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
-    @JsonProperty
+    @NotNull
     private boolean active;
 
-    public Category() {}
-
-    public Category(String name, String image, String desc, Category parentCategory, boolean active) {
-        this.name = name;
-        this.image = image;
-        this.desc = desc;
-        this.parentCategory = parentCategory;
-        this.active = active;
-    }
 }

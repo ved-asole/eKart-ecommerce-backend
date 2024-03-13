@@ -1,9 +1,13 @@
 package com.vedasole.ekartecommercebackend.payload;
 
 import com.vedasole.ekartecommercebackend.entity.Category;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -19,10 +23,16 @@ public class CategoryDto implements Serializable {
     @Serial
     private static final long serialVersionUID = -6361844320830928689L;
     private long categoryId;
+    @NotNull(message = "Category name cannot be null")
+    @NotBlank(message = "Category name cannot be blank")
     private String name;
+    @NotNull(message = "Category image cannot be null")
+    @NotBlank(message = "Category image cannot be blank")
     private String image;
+    @NotNull(message = "Category cannot be null")
     private String desc;
     private Category parentCategory;
+    @NotNull(message = "Category should be either active or non-active")
     private boolean active;
 
 }
