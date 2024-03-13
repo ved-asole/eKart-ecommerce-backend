@@ -5,20 +5,19 @@ import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepo categoryRepo;
     private final ModelMapper modelMapper;
-
-    public CategoryServiceImpl(CategoryRepo categoryRepo, ModelMapper modelMapper) {
-        this.categoryRepo = categoryRepo;
-        this.modelMapper = modelMapper;
-    }
 
         /**
      * Creates a new Category record in the database and returns the CategoryDTO representation of the newly created record.
@@ -27,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return the CategoryDTO representation of the newly created Category record
      */
     @Override
+    @Transactional
     public CategoryDto createCategory(CategoryDto categoryDto) {
         Category addedCategory = this.categoryRepo.save(dtoToCategory(categoryDto));
         return categoryToDto(addedCategory);
@@ -40,6 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return the CategoryDTO representation of the updated Category record
      */
     @Override
+    @Transactional
     public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
         Category category = dtoToCategory(categoryDto);
         Category categoryInDB = this.categoryRepo.findById(categoryId).
