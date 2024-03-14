@@ -13,35 +13,37 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link Customer}
  */
-@Value
+
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Relation(itemRelation = "customer", collectionRelation = "customers")
 public class CustomerDto implements Serializable {
     @Serial
     private static final long serialVersionUID = -4970632778733952870L;
 
-
-    private final long customerId;
+    private long customerId;
 
     @NotNull(message = "First name is required")
     @NotBlank(message = "First name cannot be blank")
-    private final String firstName;
+    private String firstName;
 
     @NotNull(message = "Last name is required")
     @NotBlank(message = "Last name cannot be blank")
-    private final String lastName;
+    private String lastName;
 
     @NotNull(message = "Email is required")
     @NotBlank(message = "Email cannot be blank")
-    private final String email;
+    private String email;
 
-    private final String password;
+    private String password;
 
     @NotNull(message = "Phone number is required")
     @NotBlank(message = "Phone number cannot be blank")
-    private final long phoneNumber;
+    private String phoneNumber;
 
-    private final LocalDateTime createDt;
+    private LocalDateTime createDt;
 
-    private final AddressDto address;
+    private AddressDto address;
 }
