@@ -1,8 +1,14 @@
 package com.vedasole.ekartecommercebackend.entity;
 
-import javax.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,12 +25,28 @@ public class Product {
     @SequenceGenerator(name = "product_seq", allocationSize = 0)
     private long productId;
 
+    @NotNull
+    @NotBlank
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @NotNull
+    @NotBlank
+    @Column(name = "image", nullable = false)
     private String image;
+
+    @NotNull
+    @NotBlank
     @Column(name = "SKU", nullable = false)
     private String sku;
+
+    @Column(name = "desc")
     private String desc;
+
+    @Column(name = "price")
     private double price;
+
+    @Column(name = "qtyInStock")
     private int qtyInStock;
 
     @ManyToOne(optional = false)
