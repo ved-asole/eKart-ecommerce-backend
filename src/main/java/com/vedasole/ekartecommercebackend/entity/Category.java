@@ -37,13 +37,15 @@ public class Category implements Serializable {
 
     @NotNull
     @NotBlank
-    @Column(nullable = false, length = 20)
+    @Column(name = "name", nullable = false, length = 20)
     private String name;
+
     @NotNull
     @NotBlank
+    @Column(name = "image", nullable = false)
     private String image;
 
-    @Column(length = 1000)
+    @Column(name = "desc", length = 1000)
     private String desc;
 
     @ManyToOne
@@ -51,6 +53,7 @@ public class Category implements Serializable {
     private Category parentCategory;
 
     @NotNull
+    @Column(name = "active", nullable = false)
     private boolean active;
 
 }
