@@ -20,7 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Validated
 @RestController
 @RequestMapping("/api/v1/products")
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin(value = {"http://localhost:5173","https://ekart.vedasole.cloud"})
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -77,14 +77,21 @@ public class ProductController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<ApiResponse> deleteProduct(
             @PathVariable Long productId) {
-        this.productService.deleteProduct(productId);
-        return new ResponseEntity<>(
-                new ApiResponse(
-                       "Product deleted successfully",
-                       true
-                ),
-                HttpStatus.OK
-        );
+        boolean isDeletedSuccessfully = this.productService.deleteProduct(productId);
+        return isDeletedSuccessfully
+                ? ResponseEntity.ok(
+                        new ApiResponse(
+                                "Product deleted successfully",
+                                true
+                        )
+                )
+                : new ResponseEntity<>(
+                        new ApiResponse(
+                                "Unable to delete the product",
+                                false
+                        ),
+                        HttpStatus.INTERNAL_SERVER_ERROR
+                );
     }
 
     /**
@@ -98,15 +105,12 @@ public class ProductController {
         @PathVariable Long productId
     ) {
         ProductDto productDto = this.productService.getProductById(productId);
-        return productDto == null ?
-            new ResponseEntity<>(HttpStatus.NOT_FOUND) :
-            new ResponseEntity<>(
+        return ResponseEntity.ok(
                     EntityModel.of(
                             productDto,
                             linkTo(methodOn(ProductController.class).getProduct(productDto.getProductId())).withSelfRel(),
                             linkTo(methodOn(CategoryController.class).getCategory(productDto.getCategoryId())).withRel(CATEGORY.getValue())
-                    ),
-                    HttpStatus.OK
+                    )
             );
     }
 
