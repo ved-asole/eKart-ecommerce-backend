@@ -22,8 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Validated
 @RestController
 @RequestMapping("/api/v1/categories")
-//@CrossOrigin(value = ["http://localhost:5173","https://ekart.vedasole.cloud"])
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin(value = {"http://localhost:5173","https://ekart.vedasole.cloud"})
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -102,11 +101,14 @@ public class CategoryController {
      * @return a list of all categories
      */
     @GetMapping
-    public CollectionModel<CategoryDto> getAllCategories(){
+    public ResponseEntity<CollectionModel<CategoryDto>> getAllCategories(){
         List<CategoryDto> allCategories = this.categoryService.getAllCategories();
-        return CollectionModel.of(
-                allCategories,
-                linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel()
+        return new ResponseEntity<>(
+                CollectionModel.of(
+                        allCategories,
+                        linkTo(methodOn(CategoryController.class).getAllCategories()).withSelfRel()
+                ),
+                HttpStatus.OK
         );
     }
 }
