@@ -22,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Validated
 @RestController
 @RequestMapping("/api/v1/categories")
-@CrossOrigin(value = {"http://localhost:5173","https://ekart.vedasole.cloud"})
+@CrossOrigin(value = {"http://localhost:5173","https://ekart.vedasole.cloud","https://develop--ekart-shopping.netlify.app"}, allowCredentials = "true")
 @RequiredArgsConstructor
 public class CategoryController {
 
