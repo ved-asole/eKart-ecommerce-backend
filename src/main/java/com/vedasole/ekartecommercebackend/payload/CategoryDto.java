@@ -1,8 +1,7 @@
 package com.vedasole.ekartecommercebackend.payload;
 
 import com.vedasole.ekartecommercebackend.entity.Category;
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 import org.springframework.hateoas.server.core.Relation;
 
 import javax.validation.constraints.NotBlank;
@@ -13,8 +12,10 @@ import java.io.Serializable;
 /**
  * DTO for {@link Category}
  */
-@Value
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Relation(itemRelation = "category", collectionRelation = "categories")
 public class CategoryDto implements Serializable {
 
