@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(APIException.class)
-    public ResponseEntity<ApiResponse> APIExceptionHandler(APIException ex) {
+    public ResponseEntity<ApiResponse> apiExceptionHandler(APIException ex) {
 
         String message = ex.getMessage();
         ApiResponse apiResponse = new ApiResponse(message, true);
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiResponse> BadCredentialsExceptionHandler(BadCredentialsException ex) {
+    public ResponseEntity<ApiResponse> badCredentialsExceptionHandler(BadCredentialsException ex) {
 
         String message = ex.getMessage();
         ApiResponse apiResponse = new ApiResponse(message, false);
