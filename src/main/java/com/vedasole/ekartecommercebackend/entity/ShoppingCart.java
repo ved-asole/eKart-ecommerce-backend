@@ -1,14 +1,14 @@
 package com.vedasole.ekartecommercebackend.entity;
 
-import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.*;
+import javax.validation.constraints.Min;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,9 +27,45 @@ public class ShoppingCart {
 
     @OneToOne(optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customerId;
+    private Customer customer;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "shoppingCart")
-    private Set<ShoppingCartItem> shoppingCartItems;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shoppingCart")
+    private List<ShoppingCartItem> shoppingCartItems;
+
+    @Column(name = "total", nullable = false)
+    @Min(value = 0, message = "Total must be greater than or equal to 0")
+    private double total;
+
+    @Column(name = "discount")
+    @Min(value = 0, message = "Discount must not be negative")
+    private double discount;
+
+    @Column(name = "create_dt", nullable = false, updatable = false)
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @Column(name = "update_dt")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public void setShoppingCartItems(List<ShoppingCartItem> shoppingCartItems) {
+        if(!(shoppingCartItems == null || shoppingCartItems.isEmpty())) {
+            this.shoppingCartItems = shoppingCartItems;
+            shoppingCartItems.forEach(shoppingCartItem -> {
+                this.total += shoppingCartItem.getProduct().getPrice() * shoppingCartItem.getQuantity();
+                this.discount += shoppingCartItem.getProduct().getDiscount();
+            });
+        }
+    }
 
 }
