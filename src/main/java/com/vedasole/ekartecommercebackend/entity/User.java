@@ -1,5 +1,6 @@
 package com.vedasole.ekartecommercebackend.entity;
 
+import com.vedasole.ekartecommercebackend.utility.AppConstant.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

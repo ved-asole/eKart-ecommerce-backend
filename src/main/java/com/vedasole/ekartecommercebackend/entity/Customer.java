@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -48,17 +50,32 @@ public class Customer {
     private String email;
 
     @Column(name = "create_dt")
+    @CreatedDate
     private LocalDateTime createDt;
 
     @Column(name = "update_dt")
+    @UpdateTimestamp
     private LocalDateTime updateDt;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "address_id")
     private Address address;
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ShoppingCart shoppingCart;
+
+    @PrePersist
+    private void onCreate() {
+        createDt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void onUpdate() {
+        updateDt = LocalDateTime.now();
+    }
 
 }

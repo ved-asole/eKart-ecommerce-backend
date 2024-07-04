@@ -52,7 +52,7 @@ public class Product {
     @Column(name = "qtyInStock")
     private int qtyInStock;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
