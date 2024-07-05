@@ -1,6 +1,9 @@
 package com.vedasole.ekartecommercebackend.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.validation.annotation.Validated;
@@ -66,6 +69,27 @@ public class ShoppingCart {
                 this.discount += shoppingCartItem.getProduct().getDiscount();
             });
         }
+    }
+
+    public void setTotal(double total) {
+        this.total = Math.floor(total * 100) / 100;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = Math.floor(discount * 100) / 100;
+    }
+
+    @Override
+    public String toString() {
+        return "ShoppingCart{" +
+                "cartId=" + cartId +
+                ", customer=" + customer +
+                ", shoppingCartItems=" + shoppingCartItems +
+                ", total=" + total +
+                ", discount=" + discount +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 
 }
