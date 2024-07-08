@@ -36,4 +36,14 @@ public class ShoppingCartItem {
     @Min(value = 0, message = "Product quantity cannot be negative")
     private long quantity;
 
+    @Override
+    public String toString() {
+        return "ShoppingCartItem{" +
+                "cartItemId=" + cartItemId +
+                ", product=" + product +
+                ", shoppingCart=" + shoppingCart.getCartId() +
+                ", quantity=" + quantity +
+                '}';
+    }
+
 }
