@@ -72,11 +72,24 @@ public class ShoppingCart {
     }
 
     public void setTotal(double total) {
-        this.total = Math.floor(total * 100) / 100;
+        this.total = total;
+        calculateTotalAndDiscount();
     }
 
     public void setDiscount(double discount) {
-        this.discount = Math.floor(discount * 100) / 100;
+        this.discount = discount;
+        calculateTotalAndDiscount();
+    }
+
+    public void calculateTotalAndDiscount() {
+        this.total = 0;
+        this.discount = 0;
+        if(!(shoppingCartItems == null || shoppingCartItems.isEmpty())) {
+            shoppingCartItems.forEach(shoppingCartItem -> {
+                this.total += shoppingCartItem.getProduct().getPrice() * shoppingCartItem.getQuantity();
+                this.discount += shoppingCartItem.getProduct().getDiscount();
+            });
+        }
     }
 
     @Override
