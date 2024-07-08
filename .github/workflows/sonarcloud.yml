@@ -36,5 +36,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to getCart PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
+          neonEkartDBUrl: ${{secrets.NEON_EKART_DB_URL}}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ved-asole_eKart-ecommerce-backend -Dsonar.organization=ved-asole -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
