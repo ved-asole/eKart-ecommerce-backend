@@ -2,8 +2,8 @@ name: SonarCloud
 on:
   push:
     branches:
-#      - master
-#      - develop
+      - master
+      - develop
       - vedasole/sonarcloud-github-workflow
   pull_request:
     types: [opened, synchronize, reopened, edited, review_requested, reopened, closed]
