@@ -14,6 +14,6 @@ public interface CategoryService {
 
     public CategoryDto getCategoryById(Long categoryId);
 
-    boolean deleteCategory(Long categoryId);
+    void deleteCategory(Long categoryId);
 
 }
