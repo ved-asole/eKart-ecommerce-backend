@@ -2,9 +2,9 @@ package com.vedasole.ekartecommercebackend.payload;
 
 import com.vedasole.ekartecommercebackend.entity.Order;
 import com.vedasole.ekartecommercebackend.entity.OrderDetail;
-import com.vedasole.ekartecommercebackend.utility.OrderStatus;
-import javax.validation.constraints.NotNull;
+import com.vedasole.ekartecommercebackend.utility.AppConstant.OrderStatus;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;

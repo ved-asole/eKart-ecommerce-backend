@@ -1,5 +1,7 @@
 package com.vedasole.ekartecommercebackend.payload;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vedasole.ekartecommercebackend.entity.Customer;
 import lombok.*;
 import org.springframework.hateoas.server.core.Relation;
@@ -37,12 +39,18 @@ public class CustomerDto implements Serializable {
     @NotBlank(message = "Email cannot be blank")
     private String email;
 
+    @NotNull(message = "Password is required")
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 
     @NotNull(message = "Phone number is required")
     @NotBlank(message = "Phone number cannot be blank")
     private String phoneNumber;
 
+    @JsonIgnore
+    private ShoppingCartDto shoppingCart;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDt;
 
     private AddressDto address;
