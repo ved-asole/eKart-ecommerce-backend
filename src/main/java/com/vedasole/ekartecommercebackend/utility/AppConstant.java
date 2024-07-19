@@ -17,6 +17,8 @@ public class AppConstant {
         CUSTOMERS("Customers"),
         SHOPPING_CART("ShoppingCart"),
         SHOPPING_CARTS("ShoppingCarts"),
+        SHOPPING_CART_ITEM("ShoppingCartItem"),
+        SHOPPING_CARTS_ITEMS("ShoppingCartItems"),
         ORDER("Order"),
         ORDERS("Orders"),
         USER("User"),

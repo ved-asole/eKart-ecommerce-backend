@@ -22,7 +22,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Validated
 @RestController
 @RequestMapping("/api/v1/categories")
-@CrossOrigin(value = {"http://localhost:5173","https://ekart.vedasole.cloud","https://develop--ekart-shopping.netlify.app"}, allowCredentials = "true")
+@CrossOrigin(value = {"http://localhost:5173","https://ekart.vedasole.cloud","https://ekart-shopping.netlify.app","https://develop--ekart-shopping.netlify.app"}, allowCredentials = "true")
 @RequiredArgsConstructor
 public class CategoryController {
 
@@ -69,10 +69,21 @@ public class CategoryController {
      */
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<ApiResponse> deleteCategory(
-            @PathVariable Long categoryId) {
-        boolean deletedSuccessfully = this.categoryService.deleteCategory(categoryId);
-        if(!deletedSuccessfully) return new ResponseEntity<>(new ApiResponse("Unable to delete the cateogry", deletedSuccessfully), HttpStatus.INTERNAL_SERVER_ERROR);
-        else return ResponseEntity.ok(new ApiResponse("Customer deleted Category", deletedSuccessfully));
+            @PathVariable Long categoryId
+    ) {
+        try {
+            this.categoryService.deleteCategory(categoryId);
+            return ResponseEntity.ok(
+                    new ApiResponse(
+                    "Product deleted successfully",
+                    true
+                    )
+            );
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ApiResponse(e.getMessage(), false), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(e.getMessage(), false), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
         /**
