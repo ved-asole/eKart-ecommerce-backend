@@ -7,6 +7,9 @@ import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepo categoryRepo;
@@ -26,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return the CategoryDTO representation of the newly created Category record
      */
     @Override
-    @Transactional
+    @CacheEvict(value = "allCategories", allEntries = true)
     public CategoryDto createCategory(CategoryDto categoryDto) {
         Category addedCategory = this.categoryRepo.save(dtoToCategory(categoryDto));
         return categoryToDto(addedCategory);
@@ -40,7 +44,10 @@ public class CategoryServiceImpl implements CategoryService {
      * @return the CategoryDTO representation of the updated Category record
      */
     @Override
-    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "category", key = "#categoryId"), // Invalidate specific category cache
+            @CacheEvict(value = "allCategories", allEntries = true) // Invalidate all categories cache
+    })
     public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
         Category category = dtoToCategory(categoryDto);
         Category categoryInDB = this.categoryRepo.findById(categoryId).
@@ -59,11 +66,27 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
+     * Deletes a category from the database based on the given category ID.
+     *
+     * @param categoryId the ID of the category to be deleted
+     */
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "category", key = "#categoryId"), // Invalidate specific category cache
+            @CacheEvict(value = "allCategories", allEntries = true) // Invalidate all categories cache
+    })
+    public void deleteCategory(Long categoryId) {
+        this.categoryRepo.deleteById(categoryId);
+    }
+
+    /**
      * Returns a list of all categories in the database as CategoryDTOs.
      *
      * @return a list of all categories in the database as CategoryDTOs
      */
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "allCategories", sync = true)
     public List<CategoryDto> getAllCategories() {
         return this.categoryRepo.findAll().stream()
                 .map(this::categoryToDto)
@@ -78,27 +101,13 @@ public class CategoryServiceImpl implements CategoryService {
      * @throws ResourceNotFoundException if the Category record with the specified id is not found
      */
     @Override
+    @Cacheable(value = "category", key = "#categoryId")
+    @Transactional(readOnly = true)
     public CategoryDto getCategoryById(Long categoryId) throws ResourceNotFoundException {
         return categoryToDto(
                 this.categoryRepo.findById(categoryId)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Category", "id", categoryId)));
-    }
-
-    /**
-     * Deletes a category from the database based on the given category ID.
-     *
-     * @param categoryId the ID of the category to be deleted
-     * @return true if the category was successfully deleted, false otherwise
-     */
-    @Override
-    public boolean deleteCategory(Long categoryId) {
-        try {
-            this.categoryRepo.deleteById(categoryId);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private Category dtoToCategory(CategoryDto categoryDto){
