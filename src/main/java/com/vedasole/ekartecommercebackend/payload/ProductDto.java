@@ -9,6 +9,7 @@ import org.springframework.hateoas.server.core.Relation;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -37,6 +38,7 @@ public final class ProductDto implements Serializable {
 
     @NotNull(message = "Product description is required")
     @NotBlank(message = "Product description cannot be blank")
+    @Size(max = 1000, message = "Product description cannot be longer than 1000 characters")
     private String desc;
 
     @NotNull(message = "Product price is required")
