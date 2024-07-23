@@ -3,11 +3,17 @@ package com.vedasole.ekartecommercebackend.payload;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vedasole.ekartecommercebackend.entity.Customer;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.constraints.Email;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -36,11 +42,19 @@ public class CustomerDto implements Serializable {
     private String lastName;
 
     @NotNull(message = "Email is required")
-    @NotBlank(message = "Email cannot be blank")
+    @NotEmpty(message = "Email address must not be empty")
+    @Email(message = "Email address is not valid",
+            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+    )
     private String email;
 
-    @NotNull(message = "Password is required")
-    @NotBlank(message = "Password cannot be blank")
+    @NotEmpty(message = "Password cannot be blank")
+    @Size(
+            min = 3,
+            max = 20,
+            message = "Password must be between minimum of 3 characters " +
+                    "and maximum of 20 characters"
+    )
     private String password;
 
     @NotNull(message = "Phone number is required")
