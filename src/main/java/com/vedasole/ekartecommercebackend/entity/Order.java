@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -50,22 +50,13 @@ public class Order {
     @NotBlank(message = "Order status should not be blank")
     private OrderStatus orderStatus;
 
-    @CreatedDate
-    private LocalDateTime createDt;
+    @Column(name = "create_dt", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
+    @Column(name = "update_dt")
     @UpdateTimestamp
-    private LocalDateTime updateDt;
-
-
-    @PrePersist
-    private void onCreate() {
-        createDt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    private void onUpdate() {
-        updateDt = LocalDateTime.now();
-    }
+    private LocalDateTime updatedAt;
 
 }
 

@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -29,10 +30,11 @@ public class ShoppingCart {
     private long cartId;
 
     @OneToOne(optional = false)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false, unique = true)
+    @JsonIgnore
     private Customer customer;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shoppingCart")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "shoppingCart", fetch = FetchType.LAZY)
     private List<ShoppingCartItem> shoppingCartItems;
 
     @Column(name = "total", nullable = false)
@@ -44,7 +46,7 @@ public class ShoppingCart {
     private double discount;
 
     @Column(name = "create_dt", nullable = false, updatable = false)
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "update_dt")
@@ -52,42 +54,30 @@ public class ShoppingCart {
     private LocalDateTime updatedAt;
 
     @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
-
     @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    public void setShoppingCartItems(List<ShoppingCartItem> shoppingCartItems) {
-        if(!(shoppingCartItems == null || shoppingCartItems.isEmpty())) {
-            this.shoppingCartItems = shoppingCartItems;
-            shoppingCartItems.forEach(shoppingCartItem -> {
-                this.total += shoppingCartItem.getProduct().getPrice() * shoppingCartItem.getQuantity();
-                this.discount += shoppingCartItem.getProduct().getDiscount();
-            });
-        }
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
+    private void onPersistOrUpdate() {
         calculateTotalAndDiscount();
     }
 
-    public void setDiscount(double discount) {
-        this.discount = discount;
+    public void setShoppingCartItems(List<ShoppingCartItem> shoppingCartItems) {
+        if (this.shoppingCartItems != null) {
+            this.shoppingCartItems.forEach(item -> item.setShoppingCart(null));
+        }
+        this.shoppingCartItems = shoppingCartItems;
+        if (shoppingCartItems != null) {
+            shoppingCartItems.forEach(item -> item.setShoppingCart(this));
+        }
         calculateTotalAndDiscount();
     }
 
     public void calculateTotalAndDiscount() {
-        this.total = 0;
-        this.discount = 0;
+        setTotal(0);
+        setDiscount(0);
         if(!(shoppingCartItems == null || shoppingCartItems.isEmpty())) {
             shoppingCartItems.forEach(shoppingCartItem -> {
-                this.total += shoppingCartItem.getProduct().getPrice() * shoppingCartItem.getQuantity();
-                this.discount += shoppingCartItem.getProduct().getDiscount();
+                double totalProductValue = shoppingCartItem.getProduct().getPrice() * shoppingCartItem.getQuantity();
+                setTotal(getTotal() + totalProductValue);
+                setDiscount(getDiscount() + totalProductValue * shoppingCartItem.getProduct().getDiscount() / 100);
             });
         }
     }

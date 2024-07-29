@@ -5,13 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -29,14 +30,25 @@ public class Customer {
     @SequenceGenerator(name = "customer_seq", allocationSize = 0)
     private long customerId;
 
-    @NotNull
-    @NotBlank
-    @Column(name = "first_name", nullable = false)
+    @NotNull(message = "First name is required")
+    @NotBlank(message = "First name cannot be blank")@Size(
+            min = 3,
+            max = 20,
+            message = "First name must be between minimum of 3 characters " +
+                    "and maximum of 20 characters"
+    )
+    @Column(name = "first_name", nullable = false, length = 20)
     private String firstName;
 
-    @NotNull
-    @NotBlank
-    @Column(name = "last_name", nullable = false)
+    @NotNull(message = "Last name is required")
+    @NotBlank(message = "Last name cannot be blank")
+    @Size(
+            min = 3,
+            max = 20,
+            message = "First name must be between minimum of 3 characters " +
+                    "and maximum of 20 characters"
+    )
+    @Column(name = "last_name", nullable = false, length = 20)
     private String lastName;
 
     @NotNull
@@ -46,36 +58,26 @@ public class Customer {
 
     @NotNull
     @NotBlank
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "create_dt")
-    @CreatedDate
-    private LocalDateTime createDt;
-
-    @Column(name = "update_dt")
-    @UpdateTimestamp
-    private LocalDateTime updateDt;
-
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "user_id")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", unique = true, nullable = false, updatable = false)
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
     private ShoppingCart shoppingCart;
 
-    @PrePersist
-    private void onCreate() {
-        createDt = LocalDateTime.now();
-    }
+    @Column(name = "create_dt", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    @PreUpdate
-    private void onUpdate() {
-        updateDt = LocalDateTime.now();
-    }
+    @Column(name = "update_dt", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
 }
