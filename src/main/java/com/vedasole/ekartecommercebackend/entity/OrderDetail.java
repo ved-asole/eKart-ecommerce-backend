@@ -22,16 +22,16 @@ import java.time.LocalDateTime;
 public class OrderDetail {
 
     @Id
-    @Column(updatable = false)
+    @Column(name = "order_detail_id", updatable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_detail_seq")
     @SequenceGenerator(name = "order_detail_seq", allocationSize = 0)
     private long orderDetailId;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @OneToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
@@ -47,4 +47,25 @@ public class OrderDetail {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    public OrderDetail(Order order, Product product, long quantity) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+    }
+
+    @PrePersist
+    @PreUpdate
+    @PreRemove
+    private void onPersistOrUpdate() { this.getOrder().calculateTotal(); }
+
+    @Override
+    public String toString() {
+        return "OrderDetail{" +
+                "orderDetailId=" + orderDetailId +
+                ", product=" + product +
+                ", quantity=" + quantity +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

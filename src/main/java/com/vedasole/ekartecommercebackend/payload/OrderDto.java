@@ -1,21 +1,56 @@
 package com.vedasole.ekartecommercebackend.payload;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vedasole.ekartecommercebackend.entity.Order;
-import com.vedasole.ekartecommercebackend.entity.OrderDetail;
 import com.vedasole.ekartecommercebackend.utility.AppConstant.OrderStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.hateoas.server.core.Relation;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 /**
  * DTO for {@link Order}
  */
-public record OrderDto(long orderId, @NotNull CustomerDto customer, @NotNull Set<OrderDetail> orderDetails,
-                       @NotNull AddressDto address, LocalDateTime orderDt, double total,
-                       OrderStatus orderStatus) implements Serializable {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Relation(itemRelation = "order")
+public class OrderDto implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 4761708818033261120L;
+
+    private long orderId;
+
+    @NotNull(message = "Customer id is required")
+    @Positive(message = "Customer id must be greater than or equal to 1")
+    private CustomerDto customer;
+
+    @NotNull(message = "Order details are required")
+    @NotEmpty(message = "Order details should not be empty")
+    private List<OrderDetailDto> orderDetails;
+
+    @NotNull(message = "Address is required")
+    private AddressDto address;
+
+    @NotNull(message = "Total is required")
+    @PositiveOrZero(message = "Total cannot be negative")
+    private double total;
+
+    private OrderStatus orderStatus;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime orderDt;
+
 }
