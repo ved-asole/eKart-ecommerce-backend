@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -43,8 +44,9 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "role", nullable = false)
+    @NotNull(message = "Order status is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", length = 10, nullable = false)
     private Role role;
 
     @Column(name = "create_dt", nullable = false, updatable = false)
@@ -75,7 +77,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getName()));
+        return List.of(new SimpleGrantedAuthority(role.getValue()));
     }
 
     @Override

@@ -3,17 +3,14 @@ package com.vedasole.ekartecommercebackend.payload;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vedasole.ekartecommercebackend.entity.Customer;
+import com.vedasole.ekartecommercebackend.utility.AppConstant.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.constraints.Email;
+import javax.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -21,13 +18,13 @@ import java.time.LocalDateTime;
 /**
  * DTO for {@link Customer}
  */
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Relation(itemRelation = "customer", collectionRelation = "customers")
 public class CustomerDto implements Serializable {
+
     @Serial
     private static final long serialVersionUID = -4970632778733952870L;
 
@@ -35,10 +32,22 @@ public class CustomerDto implements Serializable {
 
     @NotNull(message = "First name is required")
     @NotBlank(message = "First name cannot be blank")
+    @Size(
+            min = 3,
+            max = 20,
+            message = "First name must be between minimum of 3 characters " +
+                    "and maximum of 20 characters"
+    )
     private String firstName;
 
     @NotNull(message = "Last name is required")
     @NotBlank(message = "Last name cannot be blank")
+    @Size(
+            min = 3,
+            max = 20,
+            message = "Last name must be between minimum of 3 characters " +
+                    "and maximum of 20 characters"
+    )
     private String lastName;
 
     @NotNull(message = "Email is required")
@@ -60,6 +69,8 @@ public class CustomerDto implements Serializable {
     @NotNull(message = "Phone number is required")
     @NotBlank(message = "Phone number cannot be blank")
     private String phoneNumber;
+
+    private Role role;
 
     @JsonIgnore
     private ShoppingCartDto shoppingCart;

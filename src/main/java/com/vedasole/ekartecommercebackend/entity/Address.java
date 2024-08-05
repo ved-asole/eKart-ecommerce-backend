@@ -53,8 +53,7 @@ public class Address {
     private String country;
 
     @NotNull
-    @Size(max = 10)
-    @Column(name = "postal_code")
+    @Column(name = "postal_code", length = 10, nullable = false)
     private int postalCode;
 
     @Column(name = "create_dt", nullable = false, updatable = false)
@@ -65,4 +64,22 @@ public class Address {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    public Address(long addressId, String addLine1, String addLine2, String city, String state, String country, int postalCode) {
+        this.addressId = addressId;
+        this.addLine1 = addLine1;
+        this.addLine2 = addLine2;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.postalCode = postalCode;
+    }
+
+    public Address(String addLine1, String addLine2, String city, String state, String country, int postalCode) {
+        this.addLine1 = addLine1;
+        this.addLine2 = addLine2;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.postalCode = postalCode;
+    }
 }
