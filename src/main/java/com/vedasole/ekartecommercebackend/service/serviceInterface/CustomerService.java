@@ -8,20 +8,13 @@ import java.util.List;
 
 public interface CustomerService {
 
-    public CustomerDto createCustomer(CustomerDto customerDto);
-
-    public CustomerDto updateCustomer(CustomerDto customerDto , Long customerId);
-
-    public List<CustomerDto> getAllCustomers();
-
-    public CustomerDto getCustomerById(Long customerId);
-
-    public CustomerDto getCustomerByEmail(String email);
-
+    CustomerDto createCustomer(CustomerDto customerDto);
+    CustomerDto updateCustomer(CustomerDto customerDto , Long customerId);
+    List<CustomerDto> getAllCustomers();
+    CustomerDto getCustomerById(Long customerId);
+    CustomerDto getCustomerByEmail(String email);
     void deleteCustomer(Long customerId);
-
-    public User getUserForCustomer(Long customerId);
-
-    public Customer convertToCustomer(CustomerDto customerDto);
+    User getUserForCustomer(Long customerId);
+    Customer convertToCustomer(CustomerDto customerDto);
 
 }
