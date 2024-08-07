@@ -1,6 +1,6 @@
 package com.vedasole.ekartecommercebackend.payload;
 
-import com.vedasole.ekartecommercebackend.entity.OrderDetail;
+import com.vedasole.ekartecommercebackend.entity.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,18 +12,18 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * DTO for {@link OrderDetail}
+ * DTO for {@link OrderItem}
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Relation(itemRelation = "orderDetail", collectionRelation = "orderDetails")
-public class OrderDetailDto implements Serializable {
+@Relation(itemRelation = "orderItem", collectionRelation = "orderItems")
+public class OrderItemDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -5054394287337400890L;
 
-    private long orderDetailId;
+    private long orderItemId;
 
     private long orderId;
 

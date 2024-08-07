@@ -39,7 +39,7 @@ public class OrderDto implements Serializable {
 
     @NotNull(message = "Order details are required")
     @NotEmpty(message = "Order details should not be empty")
-    private List<OrderDetailDto> orderDetails;
+    private List<OrderItemDto> orderItems;
 
     @NotNull(message = "Address is required")
     private AddressDto address;

@@ -27,19 +27,16 @@ public class Order {
 
     @Id
     @Column(updatable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "shop_order_seq")
-    @SequenceGenerator(name = "shop_order_seq", allocationSize = 0)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
+    @SequenceGenerator(name = "order_seq", allocationSize = 0)
     private long orderId;
-
-//    @Column(name = "order_status", length = 10, nullable = false)
-//    private String transactionReference;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", fetch = FetchType.LAZY)
-    private List<OrderDetail> orderDetails;
+    private List<OrderItem> orderItems;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "address_id")
@@ -61,18 +58,18 @@ public class Order {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Order(long orderId, Customer customer, List<OrderDetail> orderDetails, Address address, double total, OrderStatus orderStatus) {
+    public Order(long orderId, Customer customer, List<OrderItem> orderItems, Address address, double total, OrderStatus orderStatus) {
         this.orderId = orderId;
         this.customer = customer;
-        this.orderDetails = orderDetails;
+        this.orderItems = orderItems;
         this.address = address;
         this.total = total;
         this.orderStatus = orderStatus;
     }
 
-    public Order(Customer customer, List<OrderDetail> orderDetails, Address address, double total, OrderStatus orderStatus) {
+    public Order(Customer customer, List<OrderItem> orderItems, Address address, double total, OrderStatus orderStatus) {
         this.customer = customer;
-        this.orderDetails = orderDetails;
+        this.orderItems = orderItems;
         this.address = address;
         this.total = total;
         this.orderStatus = orderStatus;
@@ -84,22 +81,22 @@ public class Order {
         calculateTotal();
     }
 
-    public void setOrderDetails(List<OrderDetail> orderDetails) {
-        if (this.orderDetails != null) {
-            this.orderDetails.forEach(orderDetail -> orderDetail.setOrder(null));
+    public void setOrderItems(List<OrderItem> orderItems) {
+        if (this.orderItems != null) {
+            this.orderItems.forEach(orderItem -> orderItem.setOrder(null));
         }
-        this.orderDetails = orderDetails;
-        if (orderDetails != null) {
-            this.orderDetails.forEach(orderDetail -> orderDetail.setOrder(this));
+        this.orderItems = orderItems;
+        if (orderItems != null) {
+            this.orderItems.forEach(orderItem -> orderItem.setOrder(this));
         }
         calculateTotal();
     }
 
     public void calculateTotal() {
         setTotal(0);
-        if(!(orderDetails == null || orderDetails.isEmpty())) {
-            orderDetails.forEach(orderDetail -> {
-                double totalProductValue = orderDetail.getProduct().getPrice() * orderDetail.getQuantity();
+        if(!(orderItems == null || orderItems.isEmpty())) {
+            orderItems.forEach(orderItem -> {
+                double totalProductValue = orderItem.getProduct().getPrice() * orderItem.getQuantity();
                 setTotal(getTotal() + totalProductValue);
             });
         }

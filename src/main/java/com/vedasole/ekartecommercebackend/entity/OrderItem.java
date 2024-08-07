@@ -18,14 +18,14 @@ import java.time.LocalDateTime;
 @Builder
 @Validated
 @Entity
-@Table(name = "order_detail")
-public class OrderDetail {
+@Table(name = "order_item")
+public class OrderItem {
 
     @Id
-    @Column(name = "order_detail_id", updatable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_detail_seq")
-    @SequenceGenerator(name = "order_detail_seq", allocationSize = 0)
-    private long orderDetailId;
+    @Column(name = "order_item_id", updatable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_item_seq")
+    @SequenceGenerator(name = "order_item_seq", allocationSize = 0)
+    private long orderItemId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
@@ -47,7 +47,7 @@ public class OrderDetail {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public OrderDetail(Order order, Product product, long quantity) {
+    public OrderItem(Order order, Product product, long quantity) {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
@@ -60,8 +60,8 @@ public class OrderDetail {
 
     @Override
     public String toString() {
-        return "OrderDetail{" +
-                "orderDetailId=" + orderDetailId +
+        return "OrderItem{" +
+                "orderItemId=" + orderItemId +
                 ", product=" + product +
                 ", quantity=" + quantity +
                 ", createdAt=" + createdAt +
