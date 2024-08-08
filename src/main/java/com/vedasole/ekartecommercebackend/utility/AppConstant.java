@@ -21,6 +21,8 @@ public class AppConstant {
         SHOPPING_CARTS_ITEMS("ShoppingCartItems"),
         ORDER("Order"),
         ORDERS("Orders"),
+        ORDER_DETAIL("Order Detail"),
+        ORDER_DETAILS("Order Details"),
         USER("User"),
         USERS("Users");
 
@@ -33,6 +35,7 @@ public class AppConstant {
     public enum OrderStatus {
         ORDER_CREATED("ORDER_CREATED"),
         ORDER_PLACED("ORDER_PLACED"),
+        ORDER_EXPIRED("ORDER_EXPIRED"),
         ORDER_FAILED("ORDER_FAILED"),
         ORDER_DISPATCHED("ORDER_DISPATCHED"),
         ORDER_SHIPPED("ORDER_SHIPPED"),
