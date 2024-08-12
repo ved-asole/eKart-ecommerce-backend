@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * Main class of the E-Kart E-Commerce Backend application.
+ * @author : Ved Asole
  */
 @SpringBootApplication
 public class EkartEcommerceBackendApplication {
@@ -16,12 +17,14 @@ public class EkartEcommerceBackendApplication {
     }
 
     /**
-     * Creates a new instance of the ModelMapper class.
+     * Creates a new instance of the MapperConfig class.
      *
-     * @return a new ModelMapper instance
+     * @return a new MapperConfig instance
      */
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+        return modelMapper;
     }
 }
