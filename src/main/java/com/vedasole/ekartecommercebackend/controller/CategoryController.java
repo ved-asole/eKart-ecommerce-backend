@@ -55,7 +55,8 @@ public class CategoryController {
     @PutMapping("/{categoryId}")
     public ResponseEntity<EntityModel<CategoryDto>> updateCategory(
             @Valid @RequestBody CategoryDto categoryDto,
-            @PathVariable Long categoryId) {
+            @PathVariable Long categoryId
+    ) {
         CategoryDto updatedCategory = categoryService.updateCategory(categoryDto, categoryId);
         Link selfLink = linkTo(CategoryController.class).slash(updatedCategory.getCategoryId()).withSelfRel();
         return ResponseEntity.ok(EntityModel.of(updatedCategory, selfLink));

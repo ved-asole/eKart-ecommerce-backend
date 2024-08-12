@@ -35,8 +35,7 @@ public class CustomerDto implements Serializable {
     @Size(
             min = 3,
             max = 20,
-            message = "First name must be between minimum of 3 characters " +
-                    "and maximum of 20 characters"
+            message = "First name must be between minimum of 3 characters and maximum of 20 characters"
     )
     private String firstName;
 
@@ -76,7 +75,7 @@ public class CustomerDto implements Serializable {
     private ShoppingCartDto shoppingCart;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createDt;
+    private LocalDateTime createdAt;
 
     private AddressDto address;
 }
