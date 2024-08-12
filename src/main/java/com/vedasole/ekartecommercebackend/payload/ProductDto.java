@@ -30,6 +30,11 @@ public final class ProductDto implements Serializable {
 
     @NotNull(message = "Product name is required")
     @NotBlank(message = "Product name cannot be blank")
+    @Size(
+            min = 3,
+            max = 100,
+            message = "Product name must be between minimum of 3 characters and maximum of 100 characters"
+    )
     private String name;
 
     @NotNull(message = "Product image is required")

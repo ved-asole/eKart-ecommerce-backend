@@ -65,7 +65,7 @@ public class ShoppingCart {
         }
         this.shoppingCartItems = shoppingCartItems;
         if (shoppingCartItems != null) {
-            shoppingCartItems.forEach(item -> item.setShoppingCart(this));
+            this.shoppingCartItems.forEach(item -> item.setShoppingCart(this));
         }
         calculateTotalAndDiscount();
     }
