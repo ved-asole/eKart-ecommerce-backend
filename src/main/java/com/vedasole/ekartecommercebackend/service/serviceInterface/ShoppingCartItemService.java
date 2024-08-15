@@ -8,10 +8,12 @@ import java.util.List;
 public interface ShoppingCartItemService {
 
     ShoppingCartItemDto createShoppingCartItem(ShoppingCartItemDto shoppingCartItemDto);
-    List<ShoppingCartItemDto> createAllShoppingCartItem(List<ShoppingCartItemDto> shoppingCartItemDtos);
+    List<ShoppingCartItemDto> createShoppingCartWithAllItems(List<ShoppingCartItemDto> shoppingCartItemDtos);
     ShoppingCartItemDto updateShoppingCartItem(ShoppingCartItemDto shoppingCartItemDto);
     void deleteShoppingCartItem(long cartItemId);
+    void deleteAllShoppingCartItems(long cartId);
     ShoppingCartItemDto getShoppingCartItem(long cartItemId);
+    List<ShoppingCartItemDto> getAllShoppingCartItems(long cartId);
     ShoppingCartItem convertToShoppingCartItem(ShoppingCartItemDto shoppingCartItemDto);
     ShoppingCartItemDto convertToShoppingCartItemDto(ShoppingCartItem shoppingCartItem);
 }

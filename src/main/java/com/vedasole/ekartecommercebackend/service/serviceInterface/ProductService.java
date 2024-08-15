@@ -1,19 +1,30 @@
 package com.vedasole.ekartecommercebackend.service.serviceInterface;
+
+import com.vedasole.ekartecommercebackend.entity.Product;
 import com.vedasole.ekartecommercebackend.payload.ProductDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface ProductService {
 
-    public ProductDto createProduct(ProductDto productDto);
+    ProductDto createProduct(ProductDto productDto);
 
-    public ProductDto updateProduct(ProductDto productDto , Long productId);
+    ProductDto updateProduct(ProductDto productDto , Long productId);
 
-    public List<ProductDto> getAllProducts();
+    List<ProductDto> getAllProducts();
 
-    public ProductDto getProductById(Long productId);
+    Page<ProductDto> getAllProductsPerPage(int page, int size, String sortBy, String sortOrder);
 
-    boolean deleteProduct(Long productId);
+    ProductDto getProductById(Long productId);
 
-    List<ProductDto> getProductsByName(String searchString);
+    void deleteProduct(Long productId);
+
+    List<ProductDto> getProductsByNameOrDesc(int page, int size, String searchKey);
+
+    List<ProductDto> getAllProductsByCategory(long categoryId);
+
+    Product productDtoToEntity(ProductDto productDto);
+
+    ProductDto productEntityToDto(Product product);
 }
