@@ -1,5 +1,6 @@
 package com.vedasole.ekartecommercebackend.service.serviceInterface;
 
+import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 
 import java.util.List;
@@ -15,5 +16,9 @@ public interface CategoryService {
     CategoryDto getCategoryById(Long categoryId);
 
     void deleteCategory(Long categoryId);
+
+    CategoryDto convertToDto(Category category);
+
+    Category convertToEntity(CategoryDto categoryDto);
 
 }
