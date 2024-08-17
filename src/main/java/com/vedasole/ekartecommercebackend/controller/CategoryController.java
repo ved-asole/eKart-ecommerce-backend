@@ -76,7 +76,7 @@ public class CategoryController {
             this.categoryService.deleteCategory(categoryId);
             return ResponseEntity.ok(
                     new ApiResponse(
-                    "Product deleted successfully",
+                    "Category deleted successfully",
                     true
                     )
             );
