@@ -44,7 +44,7 @@ class UserRepoTest {
         String email = "john@email.com";
 
         // When
-        Optional<User> userOptional = underTest.findByEmail(email);
+        Optional<User> userOptional = underTest.findByEmailIgnoreCase(email);
         boolean foundUser = userOptional.isPresent();
 
         // Then
@@ -58,7 +58,7 @@ class UserRepoTest {
         String email = "random@email.com";
 
         // When
-        Optional<User> userOptional = underTest.findByEmail(email);
+        Optional<User> userOptional = underTest.findByEmailIgnoreCase(email);
 
         // Then
         assertThatThrownBy(userOptional::get).isInstanceOf(NoSuchElementException.class);
