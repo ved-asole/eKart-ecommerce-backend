@@ -40,7 +40,7 @@ public class Category implements Serializable {
 
     @NotNull
     @NotBlank
-    @Column(name = "name", nullable = false, length = 20)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
     @NotNull

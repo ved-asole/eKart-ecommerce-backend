@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
@@ -56,6 +58,7 @@ public class CustomerDto implements Serializable {
     )
     private String email;
 
+    @NotNull(message = "Password is required")
     @NotEmpty(message = "Password cannot be blank")
     @Size(
             min = 3,
@@ -66,9 +69,14 @@ public class CustomerDto implements Serializable {
     private String password;
 
     @NotNull(message = "Phone number is required")
-    @NotBlank(message = "Phone number cannot be blank")
+    @Pattern(
+            regexp = "^(\\+\\d{1,3}[- ]?)?\\d{10}$",
+            message = "Phone number must be a valid 10-digit number"
+    )
     private String phoneNumber;
 
+    @NotNull(message = "Role is required")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @JsonIgnore
@@ -78,4 +86,16 @@ public class CustomerDto implements Serializable {
     private LocalDateTime createdAt;
 
     private AddressDto address;
+
+    public CustomerDto(String firstName, String lastName, String email, String password, String phoneNumber, Role role, ShoppingCartDto shoppingCart, AddressDto address) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
+        this.shoppingCart = shoppingCart;
+        this.address = address;
+    }
+
 }

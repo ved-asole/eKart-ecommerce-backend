@@ -86,7 +86,7 @@ public class ShoppingCart {
     public String toString() {
         return "ShoppingCart{" +
                 "cartId=" + cartId +
-                ", customer=" + customer +
+                ", customer=" + customer.getCustomerId() +
                 ", shoppingCartItems=" + shoppingCartItems +
                 ", total=" + total +
                 ", discount=" + discount +

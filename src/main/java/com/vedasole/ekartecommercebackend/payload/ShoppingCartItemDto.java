@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -27,16 +27,15 @@ public class ShoppingCartItemDto implements Serializable {
 
     private long cartItemId;
 
-    @NotNull(message = "Product id is required")
-    @Min(value = 1, message = "Product id cannot be negative")
-    private long productId;
+    @NotNull(message = "Product is required")
+    private ProductDto product;
 
     @NotNull(message = "Cart id is required")
-    @Min(value = 1, message = "Cart id cannot be negative")
+    @Positive(message = "Cart id must be greater than 0")
     private long cartId;
 
     @NotNull(message = "Product quantity is required")
-    @Min(value = 0, message = "Product quantity cannot be negative")
+    @Positive(message = "Product quantity must be greater than 0")
     private long quantity;
 
 }
