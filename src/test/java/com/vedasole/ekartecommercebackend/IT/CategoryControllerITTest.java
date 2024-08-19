@@ -47,6 +47,9 @@ class CategoryControllerITTest {
         restTemplate.getMessageConverters().add(0, converter);
     }
 
+    /**
+     * This method is responsible for setting up the test environment before each test method is executed.
+     */
     @BeforeEach
     void setUp() {
         baseUrl = baseUrl.concat(":").concat(String.valueOf(port)).concat("/api/v1/categories");
@@ -64,11 +67,17 @@ class CategoryControllerITTest {
         expected = categoryRepo.save(category);
     }
 
+    /**
+     * This method is responsible for cleaning up the test environment after each test method is executed.
+     */
     @AfterEach
     void tearDown() {
         categoryRepo.deleteAll();
     }
 
+    /**
+     * This test method is responsible for creating a new category in the system.
+     */
     @Test
     void testCreateCategory() {
         categoryRepo.deleteAll();
@@ -127,6 +136,9 @@ class CategoryControllerITTest {
         assertThat(updatedCategory).isEqualTo(expected);
     }
 
+    /**
+     * This test method is responsible for deleting an existing category in the system.
+     */
     @Test
     void deleteCategory() {
         List<Category> categories = categoryRepo.findAll();
@@ -142,6 +154,9 @@ class CategoryControllerITTest {
         }
     }
 
+    /**
+     * This test method is responsible for retrieving a category by its ID.
+     */
     @Test
     void getCategory() {
         ResponseEntity<CategoryDto> categoryDtoResponseEntity = restTemplate.getForEntity(
@@ -151,6 +166,9 @@ class CategoryControllerITTest {
         assertThat(categoryDtoResponseEntity.getBody()).isNotNull().isEqualTo(categoryService.convertToDto(expected));
     }
 
+    /**
+     * This test method is responsible for retrieving all categories in the system.
+     */
     @Test
     void getAllCategories() {
         Category category = new Category(
