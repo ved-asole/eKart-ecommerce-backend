@@ -6,6 +6,7 @@ import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -15,9 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CATEGORY;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepo categoryRepo;
@@ -32,7 +36,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @CacheEvict(value = "allCategories", allEntries = true)
     public CategoryDto createCategory(CategoryDto categoryDto) {
-        Category addedCategory = this.categoryRepo.save(dtoToCategory(categoryDto));
+        Category category = dtoToCategory(categoryDto);
+        if(category.getParentCategory() !=  null) {
+            Category parentCategory = categoryRepo.findById(category.getParentCategory().getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            CATEGORY.getValue(), "id", category.getParentCategory().getCategoryId())
+                    );
+            category.setParentCategory(parentCategory);
+        }
+        Category addedCategory = this.categoryRepo.save(category);
         return categoryToDto(addedCategory);
     }
 
@@ -52,12 +64,18 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = dtoToCategory(categoryDto);
         Category categoryInDB = this.categoryRepo.findById(categoryId).
                 orElseThrow(() -> new ResourceNotFoundException(
-                        "Category", "id" , categoryId));
+                        CATEGORY.getValue(), "id" , categoryId));
         categoryInDB.setCategoryId(category.getCategoryId());
         categoryInDB.setName(category.getName());
         categoryInDB.setImage(category.getImage());
         categoryInDB.setDesc(category.getDesc());
-        categoryInDB.setParentCategory(category.getParentCategory());
+        if(categoryInDB.getParentCategory() !=  null) {
+            Category parentCategory = categoryRepo.findById(categoryInDB.getParentCategory().getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            CATEGORY.getValue(), "id", category.getParentCategory().getCategoryId())
+                    );
+            categoryInDB.setParentCategory(parentCategory);
+        }
         categoryInDB.setActive(category.isActive());
 
         this.categoryRepo.save(categoryInDB);
@@ -108,6 +126,25 @@ public class CategoryServiceImpl implements CategoryService {
                 this.categoryRepo.findById(categoryId)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Category", "id", categoryId)));
+    }
+
+    /**
+     * @param category
+     * @return CategoryDto
+     */
+    @Override
+    public CategoryDto convertToDto(Category category) {
+        return categoryToDto(category);
+    }
+
+    /**
+     *
+     * @param categoryDto
+     * @return Category
+     */
+    @Override
+    public Category convertToEntity(CategoryDto categoryDto) {
+        return dtoToCategory(categoryDto);
     }
 
     private Category dtoToCategory(CategoryDto categoryDto){
