@@ -25,7 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Relation(itemRelation = "order")
+@Relation(itemRelation = "order", collectionRelation = "orders")
 public class OrderDto implements Serializable {
 
     @Serial
@@ -51,6 +51,9 @@ public class OrderDto implements Serializable {
     private OrderStatus orderStatus;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime orderDt;
+    private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
 
 }
