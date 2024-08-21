@@ -49,8 +49,7 @@ public class ShoppingCartItem {
 
     @PrePersist
     @PreUpdate
-    @PreRemove
-    private void onPersistOrUpdate() {
+    public void updateShoppingCartTotal() {
         this.getShoppingCart().calculateTotalAndDiscount();
     }
 
