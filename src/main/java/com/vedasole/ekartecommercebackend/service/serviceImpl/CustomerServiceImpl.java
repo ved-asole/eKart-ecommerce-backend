@@ -7,6 +7,7 @@ import com.vedasole.ekartecommercebackend.exception.APIException;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
 import com.vedasole.ekartecommercebackend.repository.CustomerRepo;
+import com.vedasole.ekartecommercebackend.repository.ShoppingCartRepo;
 import com.vedasole.ekartecommercebackend.repository.UserRepo;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CustomerService;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
@@ -39,6 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private static final Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
+    private final ShoppingCartRepo shoppingCartRepo;
 
     /**
      * Creates a new customer and saves it to the database.
@@ -75,6 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
             addedCustomer = this.customerRepo.save(customer);
             ShoppingCart shoppingCart = new ShoppingCart();
             shoppingCart.setCustomer(addedCustomer);
+            shoppingCart = shoppingCartRepo.save(shoppingCart);
             addedCustomer.setShoppingCart(shoppingCart);
             addedCustomer = this.customerRepo.save(customer);
         } catch (Exception e) {
