@@ -11,7 +11,6 @@ import org.springframework.hateoas.server.core.Relation;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.io.Serial;
 import java.io.Serializable;
@@ -33,15 +32,14 @@ public class OrderDto implements Serializable {
 
     private long orderId;
 
-    @NotNull(message = "Customer id is required")
-    @Positive(message = "Customer id must be greater than or equal to 1")
+    @NotNull(message = "Customer is required")
     private CustomerDto customer;
 
     @NotNull(message = "Order details are required")
     @NotEmpty(message = "Order details should not be empty")
     private List<OrderItemDto> orderItems;
 
-    @NotNull(message = "Address is required")
+//    @NotNull(message = "Address is required") TODO: Until Address is implemented in Order
     private AddressDto address;
 
     @NotNull(message = "Total is required")
