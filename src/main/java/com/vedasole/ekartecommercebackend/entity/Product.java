@@ -20,7 +20,15 @@ import java.time.LocalDateTime;
 @Builder
 @Validated
 @Entity
-@Table(name = "product")
+@Table(
+        name = "product",
+        indexes = {
+                @Index(name = "product_name_idx", columnList = "name"),
+                @Index(name = "product_desc_idx", columnList = "desc"),
+                @Index(name = "product_name_desc_idx", columnList = "name, desc"),
+                @Index(name = "product_category_idx", columnList = "category_id")
+        }
+)
 public class Product {
 
     @Id
