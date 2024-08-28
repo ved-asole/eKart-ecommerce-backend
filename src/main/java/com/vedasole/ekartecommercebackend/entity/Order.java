@@ -22,7 +22,13 @@ import java.util.List;
 @Builder
 @Validated
 @Entity
-@Table(name = "order")
+@Table(
+        name = "order",
+        indexes = {
+                @Index(name="order_customer_idx", columnList = "customer_id"),
+                @Index(name="order_customer_order_id_idx", columnList = "customer_id, orderId"),
+        }
+)
 public class Order {
 
     @Id
