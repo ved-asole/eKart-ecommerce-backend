@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="Logtail" class="com.logtail.logback.LogtailAppender">
+        <appName>ekart_logs</appName>
+        <sourceToken>${logtailSourceToken}</sourceToken>
+        <mdcFields>requestId,requestTime</mdcFields>
+        <mdcTypes>string,int</mdcTypes>
+        <objectMapperModule>com.fasterxml.jackson.datatype.jsr310.JavaTimeModule</objectMapperModule>
+    </appender>
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-4relative %magenta([%thread]) %highlight(%-5level) %cyan(%logger{35}) - %msg %n</pattern>
+        </encoder>
+    </appender>
+    <root level="${root.level}">
+        <appender-ref ref="Logtail" />
+        <appender-ref ref="Console" />
+    </root>
+</configuration>
