@@ -17,7 +17,7 @@ public class ApplicationInitializer implements ApplicationListener<ApplicationRe
 
     public ApplicationInitializer(
             CustomerService customerService,
-            @Value("${admin.password:Admin@123}") String adminPassword
+            @Value("${admin.password}") String adminPassword
     ) {
         this.customerService = customerService;
         this.adminPassword = adminPassword;
