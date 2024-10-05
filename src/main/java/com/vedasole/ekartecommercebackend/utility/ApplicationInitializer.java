@@ -3,6 +3,7 @@ package com.vedasole.ekartecommercebackend.utility;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CustomerService;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -23,7 +24,7 @@ public class ApplicationInitializer implements ApplicationListener<ApplicationRe
     }
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
         insertAdminUser();
     }
 
