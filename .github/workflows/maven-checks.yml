@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+env:
+  jsonSecretKey: 'ekartSecretKey'
+
 jobs:
   build:
     runs-on: ubuntu-latest
