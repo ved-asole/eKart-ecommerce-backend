@@ -22,10 +22,10 @@ import static com.vedasole.ekartecommercebackend.utility.AppConstant.OrderStatus
 @Transactional
 public class StripeService {
 
-    @Value("${frontendDomainUrl}")
-    private String DOMAIN_URL;
-    @Value("${stripeApiKey}")
-    private String STRIPE_API_KEY;
+    @Value("${frontendDomainUrl:http://localhost:5173}")
+    private String frontendDomainUrl;
+    @Value("${stripeApiKey:sample-stripe-api-key}")
+    private String stripeApiKey;
     private final OrderRepo orderRepo;
     private final AddressRepo addressRepo;
 
@@ -37,7 +37,7 @@ public class StripeService {
 
     @PostConstruct
     public void init() {
-        Stripe.apiKey = STRIPE_API_KEY;
+        Stripe.apiKey = stripeApiKey;
     }
 
     @Transactional
@@ -101,29 +101,17 @@ public class StripeService {
         orderRepo.save(savedOrder);
         String orderId = Long.toString(savedOrder.getOrderId());
         String clientReferenceNumber = "CUST" + shoppingCart.getCustomer().getCustomerId() + "_" + orderId;
-//        Coupon coupon = Coupon.create(
-//                CouponCreateParams.builder()
-//                        .setName("100F")
-//                        .setAmountOff(100L)
-//                        .setCurrency("INR")
-//                        .setMaxRedemptions(1L)
-//                        .build()
-//        );
+
         SessionCreateParams params = SessionCreateParams.builder()
                 .setCustomerCreation(SessionCreateParams.CustomerCreation.IF_REQUIRED)
                 .setClientReferenceId(clientReferenceNumber)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setCustomerEmail(shoppingCart.getCustomer().getEmail())
-//                .addDiscount(
-//                        SessionCreateParams.Discount.builder()
-//                                .setCoupon(coupon.getId())
-//                                .build()
-//                )
                 .putMetadata("order_id", orderId)
                 .putMetadata("clientReferenceNumber", clientReferenceNumber)
                 .putMetadata("customer_id", Long.toString(shoppingCart.getCustomer().getCustomerId()))
-                .setSuccessUrl(DOMAIN_URL + "/paymentConfirmation?success=true&session_id={CHECKOUT_SESSION_ID}&order_id=" + orderId + "&client_reference_id=" + clientReferenceNumber)
-                .setCancelUrl(DOMAIN_URL + "/paymentConfirmation?canceled=true&session_id={CHECKOUT_SESSION_ID}&order_id=" + orderId + "&client_reference_id=" + clientReferenceNumber)
+                .setSuccessUrl(frontendDomainUrl + "/paymentConfirmation?success=true&session_id={CHECKOUT_SESSION_ID}&order_id=" + orderId + "&client_reference_id=" + clientReferenceNumber)
+                .setCancelUrl(frontendDomainUrl + "/paymentConfirmation?canceled=true&session_id={CHECKOUT_SESSION_ID}&order_id=" + orderId + "&client_reference_id=" + clientReferenceNumber)
                 .addAllLineItem(listItems)
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .build();
