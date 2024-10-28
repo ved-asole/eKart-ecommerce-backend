@@ -45,7 +45,7 @@ jobs:
         run: sudo apt-get install -y redis-tools
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean install -DskipTests
 
       - name: Verify the build
         run: mvn verify
