@@ -16,6 +16,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Setup redis
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,6 +45,17 @@ jobs:
 
       - name: Verify the build
         run: mvn verify
+
+      - name: Wait for Redis to be ready
+        run: |
+          for i in {1..10}; do
+            if redis-cli -h localhost ping; then
+              echo "Redis is ready!"
+              break
+            fi
+            echo "Waiting for Redis..."
+            sleep 5
+          done
 
       - name: Run tests
         run: mvn test
