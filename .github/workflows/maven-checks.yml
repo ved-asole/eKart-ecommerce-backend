@@ -1,0 +1,31 @@
+name: Maven Checks
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+          cache-dependency-path: '**/pom.xml'
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Verify the build
+        run: mvn verify
+
+      - name: Run tests
+        run: mvn test
