@@ -6,11 +6,7 @@ on:
       - master
 
 env:
-  jsonSecretKey: 'fakeSecretKey'
-  frontendDomainUrl: 'http://localhost:5173'
-  ekartBackendPassword: 'fakeEkartBackendPassword'
-  stripeApiKey: 'fake-stripe-api-key'
-  adminPassword: 'fakeAdminPassword'
+  jsonSecretKey: 'ekartSecretKey'
 
 jobs:
   build:
