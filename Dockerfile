@@ -1,14 +1,12 @@
-# Start with a base image containing Java runtime
-FROM amazoncorretto:17 AS build
+FROM maven:3.9.9-amazoncorretto-17-alpine AS build
+ENV REDIS_HOST=host.docker.internal
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# The application's .jar file
-ARG JAR_FILE=target/*.jar
-
-# cd into the target directory
-WORKDIR /usr/src/app
-
-# Copy the application's jar to the container
-COPY ${JAR_FILE} app.jar
-
-# Execute the application
-ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","/usr/src/app/app.jar"]
+FROM amazoncorretto:17-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar /app/app.jar
+EXPOSE 8000
+ENTRYPOINT ["java","-jar","-Dspring.profiles.active=docker","app.jar"]
