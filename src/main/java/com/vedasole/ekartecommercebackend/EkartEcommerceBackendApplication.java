@@ -22,9 +22,8 @@ import org.springframework.core.env.Environment;
 @RequiredArgsConstructor
 public class EkartEcommerceBackendApplication {
 
-    @Value("${spring.application.name}")
+    @Value("${spring.application.name:defaultAppName}")
     private String appName;
-
 
     private final Environment environment;
 
