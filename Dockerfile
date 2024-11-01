@@ -9,4 +9,5 @@ FROM amazoncorretto:17-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/app.jar
 EXPOSE 8000
+ENV SPRING_PROFILES_ACTIVE=docker
 ENTRYPOINT ["java","-jar","-Dspring.profiles.active=docker","app.jar"]
