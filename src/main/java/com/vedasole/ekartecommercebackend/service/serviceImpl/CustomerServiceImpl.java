@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
      * @throws APIException if an error occurs while saving the customer
      */
     @Override
+    @CacheEvict(value = "customers", allEntries = true)
     public CustomerDto createCustomer(CustomerDto customerDto) {
         // Create a new user with the role of USER
         User user = new User(
@@ -98,7 +100,10 @@ public class CustomerServiceImpl implements CustomerService {
      * @throws APIException if an error occurs while updating the customer
      */
     @Override
-    @CacheEvict(value = "customers", key = "#customerId")
+    @Caching(evict = {
+            @CacheEvict(value = "customers", key = "#customerId"),
+            @CacheEvict(value = "allCustomers", allEntries = true)
+    })
     public CustomerDto updateCustomer(CustomerDto customerDto, Long customerId) {
 
         Customer customer = dtoToCustomer(customerDto);
@@ -139,7 +144,10 @@ public class CustomerServiceImpl implements CustomerService {
      * @param customerId the ID of the customer to be deleted
      */
     @Override
-    @CacheEvict(value = "customers", key = "#customerId")
+    @Caching(evict = {
+            @CacheEvict(value = "customers", key = "#customerId"),
+            @CacheEvict(value = "allCustomers", allEntries = true)
+    })
     public void deleteCustomer(Long customerId) {
         this.customerRepo.deleteById(customerId);
     }
@@ -150,6 +158,8 @@ public class CustomerServiceImpl implements CustomerService {
      * @return a list of all customers
      */
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "allCustomers", sync = true)
     public List<CustomerDto> getAllCustomers() {
         return this.customerRepo.findAll().stream()
                 .map(this::customerToDto)
