@@ -26,7 +26,7 @@ import javax.validation.Valid;
         value = {
                 "http://localhost:5173",
                 "https://ekart.vedasole.cloud",
-                "https://develop--ekart-shopping.netlify.app",
+                "https://ekart-shopping.netlify.app",
                 "https://develop--ekart-shopping.netlify.app"
         },
         allowCredentials = "true",
