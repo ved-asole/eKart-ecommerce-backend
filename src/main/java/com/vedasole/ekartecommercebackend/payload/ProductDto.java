@@ -1,5 +1,6 @@
 package com.vedasole.ekartecommercebackend.payload;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vedasole.ekartecommercebackend.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * DTO for {@link Product}
@@ -61,4 +63,11 @@ public final class ProductDto implements Serializable {
     @NotNull(message = "Category ID is required")
     @Min(value = 1, message = "Category ID cannot be negative")
     private long categoryId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedAt;
+
 }
