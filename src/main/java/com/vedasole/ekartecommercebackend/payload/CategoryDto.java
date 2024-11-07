@@ -1,7 +1,10 @@
 package com.vedasole.ekartecommercebackend.payload;
 
 import com.vedasole.ekartecommercebackend.entity.Category;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 
 import javax.validation.constraints.NotBlank;
@@ -9,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * DTO for {@link Category}
@@ -42,5 +46,9 @@ public class CategoryDto implements Serializable {
     
     @NotNull(message = "Category should be either active or non-active")
     private boolean active;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 
 }

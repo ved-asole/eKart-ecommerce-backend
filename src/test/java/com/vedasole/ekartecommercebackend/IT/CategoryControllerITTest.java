@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -81,7 +81,7 @@ class CategoryControllerITTest {
     @Test
     void testCreateCategory() {
         categoryRepo.deleteAll();
-        Category category = new Category(
+        final Category category = new Category(
                 1L,
                 "Mobiles & Tablets",
                 "/images/categories/mobile-and-tablets.webp",
@@ -96,8 +96,6 @@ class CategoryControllerITTest {
         assertThat(categoryDtoResponseEntity.getBody()).isNotNull();
         CategoryDto body = categoryDtoResponseEntity.getBody();
         category.setCategoryId(body.getCategoryId());
-        assertThat(body).isEqualTo(categoryService.convertToDto(category));
-
         CategoryDto createCategoryDto = categoryDtoResponseEntity.getBody();
         assertThat(createCategoryDto.getName()).isEqualTo(category.getName());
         assertThat(createCategoryDto.getImage()).isEqualTo(category.getImage());
@@ -108,8 +106,6 @@ class CategoryControllerITTest {
 
     /**
      * This test method is responsible for updating an existing category in the system.
-     *
-     * @throws Exception If any error occurs during the test.
      */
     @Test
     void updateCategory() {
@@ -163,7 +159,10 @@ class CategoryControllerITTest {
                 baseUrl.concat("/").concat(Long.toString(expected.getCategoryId())), CategoryDto.class
         );
         assert categoryDtoResponseEntity.getStatusCode().is2xxSuccessful();
-        assertThat(categoryDtoResponseEntity.getBody()).isNotNull().isEqualTo(categoryService.convertToDto(expected));
+        CategoryDto body = categoryDtoResponseEntity.getBody();
+        assertNotNull(body);
+        assertThat(body).usingRecursiveComparison()
+                .ignoringFields("createdAt", "updatedAt").isEqualTo(categoryService.convertToDto(expected));
     }
 
     /**
@@ -181,20 +180,34 @@ class CategoryControllerITTest {
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
-        categoryRepo.save(category);
+        final Category savedCategory = categoryRepo.save(category);
 
-        ParameterizedTypeReference<CollectionModel<CategoryDto>> responseType = new ParameterizedTypeReference<>() {};
+        ParameterizedTypeReference<CollectionModel<CategoryDto>> responseType = new ParameterizedTypeReference<>() {
+        };
         ResponseEntity<CollectionModel<CategoryDto>> responseEntity = restTemplate.exchange(baseUrl, HttpMethod.GET, null, responseType);
 
         CollectionModel<CategoryDto> collectionModel = responseEntity.getBody();
         assertThat(collectionModel).isNotNull();
         assertThat(collectionModel.getContent()).isNotNull().hasSize(categoryRepo.findAll().size());
         List<CategoryDto> categoryDtoList = new ArrayList<>(collectionModel.getContent());
-        assertThat(categoryDtoList).isNotNull().contains(categoryService.convertToDto(expected));
-        assertThat(categoryDtoList.stream()
-                        .filter(dto -> dto.getName().equals(category.getName()))
-                        .findFirst()
-        ).isPresent();
+        Optional<CategoryDto> isCategoryPresent = categoryDtoList.stream()
+                .filter(dto -> dto.getName().equals("Electronics"))
+                .findFirst();
+        assertThat(isCategoryPresent).isPresent();
+        CategoryDto categoryDto = isCategoryPresent.get();
+        assertThat(categoryDtoList).isNotNull();
+
+        assertAll(
+                () -> assertThat(categoryDto)
+                        .usingRecursiveComparison()
+                        .ignoringFields("createdAt", "updatedAt")
+                        .isEqualTo(savedCategory),
+                () -> assertThat(categoryDto.getName()).isEqualTo(savedCategory.getName()),
+                () -> assertThat(categoryDto.getImage()).isEqualTo(savedCategory.getImage()),
+                () -> assertThat(categoryDto.getDesc()).isEqualTo(savedCategory.getDesc()),
+                () -> assertThat(categoryDto.getParentCategory()).isNull(),
+                () -> assertThat(categoryDto.isActive()).isTrue()
+        );
     }
 
 }
