@@ -87,15 +87,4 @@ public class CustomerDto implements Serializable {
 
     private AddressDto address;
 
-    public CustomerDto(String firstName, String lastName, String email, String password, String phoneNumber, Role role, ShoppingCartDto shoppingCart, AddressDto address) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.role = role;
-        this.shoppingCart = shoppingCart;
-        this.address = address;
-    }
-
 }
