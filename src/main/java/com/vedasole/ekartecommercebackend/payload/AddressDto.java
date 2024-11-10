@@ -15,38 +15,38 @@ import java.io.Serializable;
 /**
  * DTO for {@link Address}
  */
-@Value
+@Value //To make the class immutable
 @AllArgsConstructor
 @Relation(itemRelation = "address", collectionRelation = "addresses")
-public final class AddressDto implements Serializable {
+public class AddressDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 4607115799900867635L;
 
-    private final long addressId;
+    long addressId;
 
     @NotNull(message = "Address Line 1 is required")
     @NotBlank(message = "Address Line 1 cannot be blank")
-    private final String addLine1;
+    String addLine1;
 
     @NotNull(message = "Address Line 2 is required")
     @NotBlank(message = "Address Line 2 cannot be blank")
-    private final String addLine2;
+    String addLine2;
 
     @NotNull(message = "City is required")
     @NotBlank(message = "City cannot be blank")
-    private final String city;
+    String city;
 
     @NotNull(message = "State is required")
     @NotBlank(message = "State cannot be blank")
-    private final String state;
+    String state;
 
     @NotNull(message = "Country is required")
     @NotBlank(message = "Country cannot be blank")
-    private final String country;
+    String country;
 
     @NotNull(message = "Postal code is required")
     @NotBlank(message = "Postal code cannot be blank")
     @Min(5)
     @Max(value = 6, message = "Postal code should be not greater than 5 characters")
-    private  final int postalCode;
+    int postalCode;
 }
