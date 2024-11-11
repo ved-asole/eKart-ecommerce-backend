@@ -64,10 +64,10 @@ public final class ProductDto implements Serializable {
     @Min(value = 1, message = "Category ID cannot be negative")
     private long categoryId;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss:mm")
     private LocalDateTime createdAt;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss:mm")
     private LocalDateTime updatedAt;
 
 }

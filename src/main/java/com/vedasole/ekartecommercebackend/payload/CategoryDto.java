@@ -1,5 +1,6 @@
 package com.vedasole.ekartecommercebackend.payload;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vedasole.ekartecommercebackend.entity.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,8 +48,10 @@ public class CategoryDto implements Serializable {
     @NotNull(message = "Category should be either active or non-active")
     private boolean active;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss:mm")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss:mm")
     private LocalDateTime updatedAt;
 
 }
