@@ -97,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
                     this.orderRepo.delete(order);
                     log.info("Order deleted successfully");
                 }, () -> {
-                    log.error("Order not found");
+                    log.error("Order not found for deleting with id: {}", orderId);
                     throw new ResourceNotFoundException("Order", "id", orderId);
                 });
     }
@@ -113,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
         return this.orderRepo.findById(orderId)
                 .map(this::orderToDto)
                 .orElseThrow(() -> {
-                    log.error("Order not found");
+                    log.error("Order not found while fetching with id: {}", orderId);
                     return new ResourceNotFoundException("Order", "id", orderId);
                 });
     }
