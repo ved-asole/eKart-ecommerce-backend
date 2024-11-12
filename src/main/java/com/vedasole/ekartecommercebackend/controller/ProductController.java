@@ -154,11 +154,10 @@ public class ProductController {
     public ResponseEntity<Page<ProductDto>> getAllProductsByPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "productId") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder
     ){
         Page<ProductDto> allProducts = this.productService.getAllProductsPerPage(page, size, sortBy, sortOrder);
-//        allProducts.getContent().forEach(productDto -> productDto.setQtyInStock(0));
         return new ResponseEntity<>(
                 allProducts,
                 HttpStatus.OK
