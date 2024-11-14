@@ -51,7 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
      * @throws APIException if an error occurs while saving the customer
      */
     @Override
-    @CacheEvict(value = "customers", allEntries = true)
+    @CacheEvict(value = "allCustomers", allEntries = true)
     public CustomerDto createCustomer(CustomerDto customerDto) {
         // Create a new user with the role of USER
         User user = new User(
