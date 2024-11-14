@@ -1,7 +1,6 @@
 package com.vedasole.ekartecommercebackend.payload;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import com.vedasole.ekartecommercebackend.entity.Customer;
 import com.vedasole.ekartecommercebackend.utility.AppConstant.Role;
 import lombok.AllArgsConstructor;
@@ -32,8 +31,7 @@ public class CustomerDto implements Serializable {
 
     private long customerId;
 
-    @NotNull(message = "First name is required")
-    @NotBlank(message = "First name cannot be blank")
+    @NotBlank(message = "First name is required")
     @Size(
             min = 3,
             max = 20,
@@ -41,8 +39,7 @@ public class CustomerDto implements Serializable {
     )
     private String firstName;
 
-    @NotNull(message = "Last name is required")
-    @NotBlank(message = "Last name cannot be blank")
+    @NotBlank(message = "Last name is required")
     @Size(
             min = 3,
             max = 20,
@@ -51,15 +48,13 @@ public class CustomerDto implements Serializable {
     )
     private String lastName;
 
-    @NotNull(message = "Email is required")
-    @NotEmpty(message = "Email address must not be empty")
+    @NotBlank(message = "Email address is required")
     @Email(message = "Email address is not valid",
             regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
     )
     private String email;
 
-    @NotNull(message = "Password is required")
-    @NotEmpty(message = "Password cannot be blank")
+    @NotBlank(message = "Password cannot be blank")
     @Size(
             min = 3,
             max = 20,
@@ -79,12 +74,12 @@ public class CustomerDto implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @JsonIgnore
+    private AddressDto address;
+
+    @JsonIncludeProperties({"cartId"})
     private ShoppingCartDto shoppingCart;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
-
-    private AddressDto address;
 
 }

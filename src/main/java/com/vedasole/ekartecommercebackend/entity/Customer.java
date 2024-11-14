@@ -27,7 +27,7 @@ public class Customer {
     @Id
     @Column(updatable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_seq")
-    @SequenceGenerator(name = "customer_seq", allocationSize = 0)
+    @SequenceGenerator(name = "customer_seq", allocationSize = 1)
     private long customerId;
 
     @NotNull(message = "First name is required")
@@ -45,22 +45,23 @@ public class Customer {
     @Size(
             min = 3,
             max = 20,
-            message = "First name must be between minimum of 3 characters " +
+            message = "Last name must be between minimum of 3 characters " +
                     "and maximum of 20 characters"
     )
     @Column(name = "last_name", nullable = false, length = 20)
     private String lastName;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Phone number is required")
+    @NotBlank(message = "Phone number cannot be blank")
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Email is required")
+    @NotBlank(message = "Email cannot be blank")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @NotNull(message = "User is required")
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", unique = true, nullable = false, updatable = false)
     private User user;
