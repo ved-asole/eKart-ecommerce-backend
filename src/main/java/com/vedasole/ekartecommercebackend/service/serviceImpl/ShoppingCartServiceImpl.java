@@ -139,18 +139,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional(readOnly = true)
     public ShoppingCartDto getCart(long customerId) {
-        Optional<Customer> customerOptional = customerRepo.findById(customerId);
-        customerOptional.ifPresentOrElse(
-                customer -> {
-                    ShoppingCart shoppingCart = customer.getShoppingCart();
-                    if(shoppingCart == null)
-                        throw new ResourceNotFoundException(SHOPPING_CART.getValue(), "customerId", customerId);
-                },
-                () -> {
-                    throw new ResourceNotFoundException(CUSTOMER.getValue(), "customerId", customerId);
-                }
-        );
-        return shoppingCartToDto(customerOptional.get().getShoppingCart());
+        Customer customer = customerRepo.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException(CUSTOMER.getValue(), "customerId", customerId));
+        ShoppingCart shoppingCart = Optional.ofNullable(customer.getShoppingCart())
+                .orElseThrow(() -> new ResourceNotFoundException(SHOPPING_CART.getValue(), "customerId", customerId));
+        return shoppingCartToDto(shoppingCart);
     }
 
     private void updateShoppingCartTotalAndDiscount(ShoppingCart shoppingCart) {
