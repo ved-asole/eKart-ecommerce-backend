@@ -81,7 +81,7 @@ public class CustomerServiceImpl implements CustomerService {
             shoppingCart.setCustomer(addedCustomer);
             shoppingCart = shoppingCartRepo.save(shoppingCart);
             addedCustomer.setShoppingCart(shoppingCart);
-            addedCustomer = this.customerRepo.save(customer);
+            addedCustomer = this.customerRepo.save(addedCustomer);
         } catch (Exception e) {
             throw new APIException("Failed to save customer");
         }
@@ -216,9 +216,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     /**
+     * Converts a CustomerDto object to a Customer entity.
      *
-     * @param customerDto
-     * @return
+     * @param customerDto the CustomerDto object containing customer data to be converted
+     * @return a Customer entity mapped from the provided CustomerDto
      */
     @Override
     public Customer convertToCustomer(CustomerDto customerDto) {
