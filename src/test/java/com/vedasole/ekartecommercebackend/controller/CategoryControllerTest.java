@@ -1,6 +1,7 @@
 package com.vedasole.ekartecommercebackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vedasole.ekartecommercebackend.config.TestMailConfig;
 import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryService;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestMailConfig.class)
 class CategoryControllerTest {
 
     @LocalServerPort
