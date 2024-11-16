@@ -12,16 +12,17 @@ import com.vedasole.ekartecommercebackend.repository.UserRepo;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.CustomerService;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.context.Context;
 
+import javax.mail.MessagingException;
 import java.util.List;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CUSTOMER;
@@ -34,14 +35,15 @@ import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.U
 @Service
 @AllArgsConstructor
 @Transactional
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepo customerRepo;
     private final UserRepo userRepo;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-    private static final Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
     private final ShoppingCartRepo shoppingCartRepo;
+    private final EmailServiceImpl emailService;
 
     /**
      * Creates a new customer and saves it to the database.
@@ -60,35 +62,43 @@ public class CustomerServiceImpl implements CustomerService {
                 customerDto.getRole() != null ? customerDto.getRole() : AppConstant.Role.USER
         );
         // Save the user to the database
-        User savedUser;
+        User newUser;
         try {
-            savedUser = this.userRepo.save(user);
+            newUser = this.userRepo.save(user);
+            log.debug("Saved new user with email: {}", newUser.getEmail());
         } catch (Exception e) {
             throw new APIException("Failed to save user");
         }
 
-        log.debug("User saved : {}", savedUser);
-
         // Create a new customer and set the user to the newly created user
         Customer customer = dtoToCustomer(customerDto);
-        customer.setUser(savedUser);
+        customer.setUser(newUser);
 
         // Save the customer to the database
-        Customer addedCustomer;
+        Customer newCustomer;
         try {
-            addedCustomer = this.customerRepo.save(customer);
+            newCustomer = this.customerRepo.save(customer);
             ShoppingCart shoppingCart = new ShoppingCart();
-            shoppingCart.setCustomer(addedCustomer);
+            shoppingCart.setCustomer(newCustomer);
             shoppingCart = shoppingCartRepo.save(shoppingCart);
-            addedCustomer.setShoppingCart(shoppingCart);
-            addedCustomer = this.customerRepo.save(addedCustomer);
+            newCustomer.setShoppingCart(shoppingCart);
+            newCustomer = this.customerRepo.save(newCustomer);
+            log.debug("Customer saved with id : {}", newCustomer.getEmail());
         } catch (Exception e) {
+            log.error("Failed to save customer: {}", customerDto.getEmail());
             throw new APIException("Failed to save customer");
         }
 
-        log.debug("Customer saved with id : {}", addedCustomer.getCustomerId());
+        // Send welcome email
+        try{
+            sendWelcomeEmail(newUser.getEmail(), newCustomer.getFirstName());
+            log.debug("Welcome email send to the user with email: {}", newUser.getEmail());
+        } catch (MessagingException e) {
+            log.error("Error sending welcome email to new customer with email: {}", newUser.getEmail(), e);
+        }
 
-        return customerToDto(addedCustomer);
+        log.info("New user created with email: {}", newCustomer.getEmail());
+        return customerToDto(newCustomer);
     }
 
     /**
@@ -213,6 +223,19 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         CUSTOMER.getValue(), "id", customerId)
                 );
+    }
+
+    /**
+     * Sends a welcome email to a new customer.
+     *
+     * @param email the email address of the recipient
+     * @param firstName the first name of the recipient to personalize the email
+     * @throws MessagingException if an error occurs while sending the email
+     */
+    private void sendWelcomeEmail(String email, String firstName) throws MessagingException {
+        Context context = new Context();
+        context.setVariable("name", firstName);
+        emailService.sendMimeMessage(email,"Welcome to Ekart Shopping!", context, "welcome");
     }
 
     /**
