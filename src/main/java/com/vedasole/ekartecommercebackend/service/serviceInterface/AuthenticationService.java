@@ -3,6 +3,7 @@ package com.vedasole.ekartecommercebackend.service.serviceInterface;
 import com.vedasole.ekartecommercebackend.payload.AuthenticationRequest;
 import com.vedasole.ekartecommercebackend.payload.AuthenticationResponse;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -34,5 +35,11 @@ public interface AuthenticationService {
      * @return True if the token is valid, false otherwise.
      */
     boolean isTokenValid(String token);
+
+    void generatePasswordResetToken(String email) throws MessagingException;
+
+    boolean resetPassword(String token, String newPassword);
+
+    boolean isResetTokenValid(String token);
 
 }
