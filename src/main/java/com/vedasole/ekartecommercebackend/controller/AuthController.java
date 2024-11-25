@@ -1,7 +1,9 @@
 package com.vedasole.ekartecommercebackend.controller;
 
+import com.vedasole.ekartecommercebackend.payload.ApiResponse;
 import com.vedasole.ekartecommercebackend.payload.AuthenticationRequest;
 import com.vedasole.ekartecommercebackend.payload.AuthenticationResponse;
+import com.vedasole.ekartecommercebackend.payload.PasswordResetRequestDto;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -66,6 +69,37 @@ public class AuthController {
         boolean isValid = this.authenticationService.authenticate(request);
         if(isValid) return new ResponseEntity<>(true, HttpStatus.OK);
         else return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse> generatePasswordResetToken(@RequestParam String email) {
+        try {
+            authenticationService.generatePasswordResetToken(email.replace("%40","@"));
+            return new ResponseEntity<>(new ApiResponse("Password reset email sent successfully", true), HttpStatus.OK);
+        } catch (MessagingException e) {
+            return new ResponseEntity<>(new ApiResponse("Cannot send email to the emailId: " + email, false), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody PasswordResetRequestDto passwordResetRequestDto) {
+        boolean tokenValid = authenticationService.isResetTokenValid(passwordResetRequestDto.getToken());
+        if (!tokenValid) {
+            return new ResponseEntity<>(new ApiResponse("Invalid or expired token", false), HttpStatus.BAD_REQUEST);
+        }
+        boolean isReset = authenticationService.resetPassword(passwordResetRequestDto.getToken(), passwordResetRequestDto.getNewPassword());
+        if (isReset) {
+            return new ResponseEntity<>(new ApiResponse("Password reset successfully", true), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new ApiResponse("Invalid or expired token", false), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/validate-reset-token")
+    public ResponseEntity<Boolean> isResetTokenValid(@RequestParam String token) {
+        boolean isTokenValid = authenticationService.isResetTokenValid(token);
+        if(isTokenValid) return new ResponseEntity<>(true, HttpStatus.OK);
+        else return new ResponseEntity<>(false, HttpStatus.BAD_GATEWAY);
     }
 
 }

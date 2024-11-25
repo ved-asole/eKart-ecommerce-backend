@@ -3,7 +3,6 @@ package com.vedasole.ekartecommercebackend.service.serviceImpl;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.EmailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
         String html = templateEngine.process(template, context);
         helper.setText(html, true);
         emailSender.send(message);
-        log.info("Email sent to email: {} with subject : {}", to, subject);
+        log.info("Email sent to email: '{}' with subject: '{}'", to, subject);
     }
 
 }
