@@ -5,37 +5,28 @@ import com.stripe.model.checkout.Session;
 import com.vedasole.ekartecommercebackend.entity.ShoppingCart;
 import com.vedasole.ekartecommercebackend.exception.APIException;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
-import com.vedasole.ekartecommercebackend.payload.CustomerDto;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.CustomerService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.EmailService;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.PaymentService;
 import com.vedasole.ekartecommercebackend.service.serviceInterface.ShoppingCartService;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
 import java.util.Map;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     private final StripeService stripeService;
     private final ShoppingCartService shoppingCartService;
+    private final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
     private final OrderRepo orderRepo;
-    private final CustomerService customerService;
-    private final EmailService emailService;
-    private static final String ORDER_ID_STRING = "orderId";
-    private static final String CUSTOMER_ID_STRING = "customerId";
-    private static final String ORDER_STRING = "Order";
 
     /**
      * This method creates a Stripe checkout session for the provided shopping cart.
@@ -69,70 +60,47 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public void handleCheckoutSessionEvents(Map<String, Object> payloadMap) {
-        Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
-        log.debug("Checkout session - dataObjectMap.client_reference_id : {}" , dataObjectMap.get("client_reference_id"));
+        Map<String, Object> dataMap = (Map<String, Object>) payloadMap.get("data");
+        Map<String, Object> dataObjectMap = (Map<String, Object>) dataMap.get("object");
+        log.debug("dataObjectMap.client_reference_id : {}" , dataObjectMap.get("client_reference_id"));
         Map<String, Object> metadataObjectMap = (Map<String, Object>) dataObjectMap.get("metadata");
-        log.info("Checkout session - dataObjectMap.metadata.order_id : {}", metadataObjectMap.get(ORDER_ID_STRING));
-        log.info("Checkout session - dataObjectMap.metadata.customer_id : {}", metadataObjectMap.get(CUSTOMER_ID_STRING));
-        log.info("Checkout session - dataObjectMap.payment_status : {}", dataObjectMap.get("payment_status"));
-        log.info("Checkout session - dataObjectMap.httpStatus : {}", dataObjectMap.get("httpStatus"));
+        log.info("dataObjectMap.metadata.order_id : {}", metadataObjectMap.get("order_id"));
+        log.info("dataObjectMap.metadata.customer_id : {}", metadataObjectMap.get("customer_id"));
+        log.info("dataObjectMap.payment_status : {}", dataObjectMap.get("payment_status"));
+        log.info("dataObjectMap.httpStatus : {}", dataObjectMap.get("httpStatus"));
 
         if (
                 dataObjectMap.get("status").equals("complete")
-                && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
-                && metadataObjectMap.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString()) > 0
+                && metadataObjectMap.get("order_id") != null && Long.parseLong(metadataObjectMap.get("order_id").toString()) > 0
+                && metadataObjectMap.get("customer_id") != null && Long.parseLong(metadataObjectMap.get("customer_id").toString()) > 0
         ) {
-            long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
-            long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
+            long orderId = Long.parseLong(metadataObjectMap.get("order_id").toString());
+            long customerId = Long.parseLong(metadataObjectMap.get("customer_id").toString());
             orderRepo.findById(orderId)
                     .ifPresentOrElse(
                             order -> {
                                 if (order.getCustomer().getCustomerId() == customerId) {
-                                    // Update Order status
                                     order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
                                     orderRepo.save(order);
-                                    // Clear the user cart
-                                    CustomerDto customer = customerService.getCustomerById(customerId);
-                                    customer.getShoppingCart().setShoppingCartItems(null);
-                                    customer.getShoppingCart().setDiscount(0);
-                                    customer.getShoppingCart().setTotal(0);
-                                    customerService.updateCustomer(customer, customerId);
-
-                                    Context context = new Context();
-                                    context.setVariable("order", order);
-
-                                    //send notification to users
-                                    try {
-                                        emailService.sendMimeMessage(
-                                                customer.getEmail(),
-                                                "Order Confirmation",
-                                                context,
-                                                "orderConfirmation"
-                                        );
-                                    } catch (MessagingException e) {
-                                        log.error("Failed to send order confirmation email to {}", customer.getEmail(), e);
-                                        throw new APIException("Failed to send order confirmation email", e);
-                                    }
-
                                 } else {
                                     log.error("Order {} is not for customerId : {}", orderId, customerId);
-                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMER_ID_STRING, customerId);
+                                    throw new ResourceNotFoundException("Order", "customerId", customerId);
                                 }
                                 order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
                                 orderRepo.save(order);
                             },
                             () -> {
-                                log.error("Order not found in complete checkout session event with id : {}", orderId);
-                                throw new ResourceNotFoundException(ORDER_STRING, "id", customerId);
+                                log.error("Order not found with id : {}", orderId);
+                                throw new ResourceNotFoundException("Order", "id", customerId);
                             }
                     );
         } else if (
                 dataObjectMap.get("status").equals("expired")
-                && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
-                && metadataObjectMap.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString()) > 0
+                && metadataObjectMap.get("order_id") != null && Long.parseLong(metadataObjectMap.get("order_id").toString()) > 0
+                && metadataObjectMap.get("customer_id") != null && Long.parseLong(metadataObjectMap.get("customer_id").toString()) > 0
         ) {
-            long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
-            long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
+            long orderId = Long.parseLong(metadataObjectMap.get("order_id").toString());
+            long customerId = Long.parseLong(metadataObjectMap.get("customer_id").toString());
             orderRepo.findById(orderId)
                     .ifPresentOrElse(
                             order -> {
@@ -140,22 +108,17 @@ public class PaymentServiceImpl implements PaymentService {
                                     order.setOrderStatus(AppConstant.OrderStatus.ORDER_EXPIRED);
                                     orderRepo.save(order);
                                 } else {
-                                    log.error("Order {} does not belong to same customerId : {}", orderId, customerId);
-                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMER_ID_STRING, customerId);
+                                    log.error("Order {} does not belong to customerId : {}", orderId, customerId);
+                                    throw new ResourceNotFoundException("Order", "customerId", customerId);
                                 }
                             },
                             () -> {
-                                log.error("Order not found in expired checkout session event with id : {}", orderId);
-                                throw new ResourceNotFoundException(ORDER_STRING, "id", customerId);
+                                log.error("Order not found with id : {}", orderId);
+                                throw new ResourceNotFoundException("Order", "id", customerId);
                             }
                     );
         }
         else throw new APIException("Webhook received with invalid data");
-    }
-
-    private static Map<String, Object> getDataObjectMap(Map<String, Object> payloadMap) {
-        Map<String, Object> dataMap = (Map<String, Object>) payloadMap.get("data");
-        return (Map<String, Object>) dataMap.get("object");
     }
 
     /**
@@ -167,21 +130,22 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void handlePaymentIntentEvents(Map<String, Object> payloadMap) {
         String eventType = payloadMap.get("type").toString();
-        Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
-        log.debug("Payment Intent - dataObjectMap.client_reference_id : {}" , dataObjectMap.get("client_reference_id"));
+        Map<String, Object> dataMap = (Map<String, Object>) payloadMap.get("data");
+        Map<String, Object> dataObjectMap = (Map<String, Object>) dataMap.get("object");
+        log.debug("dataObjectMap.client_reference_id : {}" , dataObjectMap.get("client_reference_id"));
         Map<String, Object> metadataObjectMap = (Map<String, Object>) dataObjectMap.get("metadata");
-        log.info("Payment Intent - dataObjectMap.metadata.order_id : {}", metadataObjectMap.get(ORDER_ID_STRING));
-        log.info("Payment Intent - dataObjectMap.metadata.customer_id : {}", metadataObjectMap.get(CUSTOMER_ID_STRING));
-        log.info("Payment Intent - dataObjectMap.payment_status : {}", dataObjectMap.get("payment_status"));
-        log.info("Payment Intent - dataObjectMap.httpStatus : {}", dataObjectMap.get("httpStatus"));
+        log.info("dataObjectMap.metadata.order_id : {}", metadataObjectMap.get("order_id"));
+        log.info("dataObjectMap.metadata.customer_id : {}", metadataObjectMap.get("customer_id"));
+        log.info("dataObjectMap.payment_status : {}", dataObjectMap.get("payment_status"));
+        log.info("dataObjectMap.httpStatus : {}", dataObjectMap.get("httpStatus"));
 
         if (
                 eventType.contains("payment_failed")
-                        && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
-                        && metadataObjectMap.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString()) > 0
+                        && metadataObjectMap.get("order_id") != null && Long.parseLong(metadataObjectMap.get("order_id").toString()) > 0
+                        && metadataObjectMap.get("customer_id") != null && Long.parseLong(metadataObjectMap.get("customer_id").toString()) > 0
         ) {
-            long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
-            long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
+            long orderId = Long.parseLong(metadataObjectMap.get("order_id").toString());
+            long customerId = Long.parseLong(metadataObjectMap.get("customer_id").toString());
             orderRepo.findById(orderId)
                     .ifPresentOrElse(
                             order -> {
@@ -190,12 +154,12 @@ public class PaymentServiceImpl implements PaymentService {
                                     orderRepo.save(order);
                                 } else {
                                     log.error("Order {} does not belong to customerId : {}", orderId, customerId);
-                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMER_ID_STRING, customerId);
+                                    throw new ResourceNotFoundException("Order", "customerId", customerId);
                                 }
                             },
                             () -> {
                                 log.error("Order not found with id : {}", orderId);
-                                throw new ResourceNotFoundException(ORDER_STRING, "id", customerId);
+                                throw new ResourceNotFoundException("Order", "id", customerId);
                             }
                     );
         }
@@ -206,10 +170,12 @@ public class PaymentServiceImpl implements PaymentService {
      * This method handles the Stripe events received from the Stripe webhook.
      *
      * @param payloadMap The payload map containing the event data.
+     * @param sigHeader The Stripe signature header.
      */
     @Override
-    public void handleStripeEvents(Map<String, Object> payloadMap) {
-        Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
+    public void handleStripeEvents(Map<String, Object> payloadMap, String sigHeader) {
+        Map<String, Object> dataMap = (Map<String, Object>) payloadMap.get("data");
+        Map<String, Object> dataObjectMap = (Map<String, Object>) dataMap.get("object");
 
         log.info("object_id : {}", dataObjectMap.get("id"));
         JSONObject dataObject = new JSONObject(dataObjectMap);
