@@ -12,6 +12,6 @@ public interface PaymentService {
 
     void handlePaymentIntentEvents(Map<String, Object> payloadMap);
 
-    void handleStripeEvents(Map<String, Object> payloadMap, String sigHeader);
+    void handleStripeEvents(Map<String, Object> payloadMap);
 
 }
