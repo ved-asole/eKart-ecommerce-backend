@@ -16,5 +16,6 @@ public interface CustomerService {
     void deleteCustomer(Long customerId);
     User getUserForCustomer(Long customerId);
     Customer convertToCustomer(CustomerDto customerDto);
+    CustomerDto convertToCustomerDto(Customer customer);
 
 }

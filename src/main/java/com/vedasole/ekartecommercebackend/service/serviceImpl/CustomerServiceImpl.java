@@ -24,6 +24,7 @@ import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
 import java.util.List;
+import java.util.Optional;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CUSTOMER;
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.USER;
@@ -129,7 +130,9 @@ public class CustomerServiceImpl implements CustomerService {
                         USER.getValue(), "id", userId));
 
         userForCustomerInDB.setEmail(customerDto.getEmail());
-        userForCustomerInDB.setPassword(passwordEncoder.encode(customerDto.getPassword()));
+        Optional.ofNullable(customerDto.getPassword()).ifPresent(
+                password -> userForCustomerInDB.setPassword(passwordEncoder.encode(password))
+        );
         userForCustomerInDB.setRole(customerDto.getRole());
 
         User updatedUser = this.userRepo.save(userForCustomerInDB);
@@ -138,7 +141,6 @@ public class CustomerServiceImpl implements CustomerService {
         customerFromDB.setFirstName(customer.getFirstName());
         customerFromDB.setLastName(customer.getLastName());
         customerFromDB.setPhoneNumber(customer.getPhoneNumber());
-//        customerFromDB.setUpdateDt(LocalDateTime.now());
         //TODO : Add Address functionality
         customerFromDB.setAddress(customer.getAddress());
 
@@ -248,6 +250,18 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer convertToCustomer(CustomerDto customerDto) {
         return dtoToCustomer(customerDto);
     }
+
+    /**
+     * Converts a Customer entity to a CustomerDto object.
+     *
+     * @param customer the Customer entity containing customer data to be converted
+     * @return a CustomerDto object mapped from the provided Customer entity
+     */
+    @Override
+    public CustomerDto convertToCustomerDto(Customer customer) {
+        return customerToDto(customer);
+    }
+
 
     /**
      * Maps a CustomerDto to a Customer.
