@@ -8,14 +8,12 @@ import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.CustomerService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.EmailService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.PaymentService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ShoppingCartService;
+import com.vedasole.ekartecommercebackend.service.serviceInterface.*;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
@@ -30,11 +28,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final StripeService stripeService;
     private final ShoppingCartService shoppingCartService;
+    private final ShoppingCartItemService shoppingCartItemService;
     private final OrderRepo orderRepo;
     private final CustomerService customerService;
     private final EmailService emailService;
-    private static final String ORDER_ID_STRING = "orderId";
-    private static final String CUSTOMER_ID_STRING = "customerId";
+    private static final String ORDER_ID_STRING = "order_id";
+    private static final String CUSTOMERID_STRING = "customerId";
+    private static final String CUSTOMER_ID_STRING = "customer_id";
     private static final String ORDER_STRING = "Order";
 
     /**
@@ -70,62 +70,21 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void handleCheckoutSessionEvents(Map<String, Object> payloadMap) {
         Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
-        log.debug("Checkout session - dataObjectMap.client_reference_id : {}" , dataObjectMap.get("client_reference_id"));
         Map<String, Object> metadataObjectMap = (Map<String, Object>) dataObjectMap.get("metadata");
-        log.info("Checkout session - dataObjectMap.metadata.order_id : {}", metadataObjectMap.get(ORDER_ID_STRING));
-        log.info("Checkout session - dataObjectMap.metadata.customer_id : {}", metadataObjectMap.get(CUSTOMER_ID_STRING));
-        log.info("Checkout session - dataObjectMap.payment_status : {}", dataObjectMap.get("payment_status"));
-        log.info("Checkout session - dataObjectMap.httpStatus : {}", dataObjectMap.get("httpStatus"));
+        log.debug(
+                "Checkout session event received with client_reference_id[{}], order_id[{}], customer_id[{}], payment_status[{}]",
+                dataObjectMap.get("client_reference_id"),
+                metadataObjectMap.get(ORDER_ID_STRING),
+                metadataObjectMap.get(CUSTOMER_ID_STRING),
+                dataObjectMap.get("payment_status")
+        );
 
         if (
                 dataObjectMap.get("status").equals("complete")
                 && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
                 && metadataObjectMap.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString()) > 0
         ) {
-            long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
-            long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
-            orderRepo.findById(orderId)
-                    .ifPresentOrElse(
-                            order -> {
-                                if (order.getCustomer().getCustomerId() == customerId) {
-                                    // Update Order status
-                                    order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
-                                    orderRepo.save(order);
-                                    // Clear the user cart
-                                    CustomerDto customer = customerService.getCustomerById(customerId);
-                                    customer.getShoppingCart().setShoppingCartItems(null);
-                                    customer.getShoppingCart().setDiscount(0);
-                                    customer.getShoppingCart().setTotal(0);
-                                    customerService.updateCustomer(customer, customerId);
-
-                                    Context context = new Context();
-                                    context.setVariable("order", order);
-
-                                    //send notification to users
-                                    try {
-                                        emailService.sendMimeMessage(
-                                                customer.getEmail(),
-                                                "Order Confirmation",
-                                                context,
-                                                "orderConfirmation"
-                                        );
-                                    } catch (MessagingException e) {
-                                        log.error("Failed to send order confirmation email to {}", customer.getEmail(), e);
-                                        throw new APIException("Failed to send order confirmation email", e);
-                                    }
-
-                                } else {
-                                    log.error("Order {} is not for customerId : {}", orderId, customerId);
-                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMER_ID_STRING, customerId);
-                                }
-                                order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
-                                orderRepo.save(order);
-                            },
-                            () -> {
-                                log.error("Order not found in complete checkout session event with id : {}", orderId);
-                                throw new ResourceNotFoundException(ORDER_STRING, "id", customerId);
-                            }
-                    );
+            handleCompletedCheckoutSessionEvent(metadataObjectMap);
         } else if (
                 dataObjectMap.get("status").equals("expired")
                 && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
@@ -141,7 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
                                     orderRepo.save(order);
                                 } else {
                                     log.error("Order {} does not belong to same customerId : {}", orderId, customerId);
-                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMER_ID_STRING, customerId);
+                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMERID_STRING, customerId);
                                 }
                             },
                             () -> {
@@ -150,7 +109,57 @@ public class PaymentServiceImpl implements PaymentService {
                             }
                     );
         }
-        else throw new APIException("Webhook received with invalid data");
+        else throw new APIException("Webhook received with invalid data", HttpStatus.BAD_REQUEST);
+    }
+
+    private void handleCompletedCheckoutSessionEvent(Map<String, Object> metadataObjectMap) {
+        long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
+        long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
+        orderRepo.findById(orderId)
+                .ifPresentOrElse(
+                        order -> {
+                            if (order.getCustomer().getCustomerId() == customerId) {
+                                // Update Order status
+                                order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
+                                orderRepo.save(order);
+                                // Clear the user cart
+                                CustomerDto customer = customerService.getCustomerById(customerId);
+                                customerService.updateCustomer(customer, customerId);
+
+                                shoppingCartItemService.deleteAllShoppingCartItems(customer.getShoppingCart().getCartId());
+
+                                // Format order total
+                                order.setTotal(Math.round(order.getTotal()));
+
+                                Context context = new Context();
+                                context.setVariable("order", order);
+
+                                //send notification to users
+                                try {
+                                    log.info("Sending email for Order ID: {}, Total Amount: {}", order.getOrderId(), order.getTotal());
+                                    emailService.sendMimeMessage(
+                                            customer.getEmail(),
+                                            "Order Confirmation",
+                                            context,
+                                            "orderConfirmation"
+                                    );
+                                } catch (MessagingException e) {
+                                    log.error("Failed to send order confirmation email to {}", customer.getEmail(), e);
+                                    throw new APIException("Failed to send order confirmation email", e);
+                                }
+
+                            } else {
+                                log.error("Order {} is not for customerId : {}", orderId, customerId);
+                                throw new ResourceNotFoundException(ORDER_STRING, CUSTOMERID_STRING, customerId);
+                            }
+                            order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
+                            orderRepo.save(order);
+                        },
+                        () -> {
+                            log.error("Order not found in complete checkout session event with id : {}", orderId);
+                            throw new ResourceNotFoundException(ORDER_STRING, "id", customerId);
+                        }
+                );
     }
 
     private static Map<String, Object> getDataObjectMap(Map<String, Object> payloadMap) {
@@ -168,12 +177,14 @@ public class PaymentServiceImpl implements PaymentService {
     public void handlePaymentIntentEvents(Map<String, Object> payloadMap) {
         String eventType = payloadMap.get("type").toString();
         Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
-        log.debug("Payment Intent - dataObjectMap.client_reference_id : {}" , dataObjectMap.get("client_reference_id"));
         Map<String, Object> metadataObjectMap = (Map<String, Object>) dataObjectMap.get("metadata");
-        log.info("Payment Intent - dataObjectMap.metadata.order_id : {}", metadataObjectMap.get(ORDER_ID_STRING));
-        log.info("Payment Intent - dataObjectMap.metadata.customer_id : {}", metadataObjectMap.get(CUSTOMER_ID_STRING));
-        log.info("Payment Intent - dataObjectMap.payment_status : {}", dataObjectMap.get("payment_status"));
-        log.info("Payment Intent - dataObjectMap.httpStatus : {}", dataObjectMap.get("httpStatus"));
+        log.debug(
+                "Payment Intent event received with client_reference_id[{}], order_id[{}], customer_id[{}], payment_status[{}]",
+                dataObjectMap.get("client_reference_id"),
+                metadataObjectMap.get(ORDER_ID_STRING),
+                metadataObjectMap.get(CUSTOMER_ID_STRING),
+                dataObjectMap.get("payment_status")
+        );
 
         if (
                 eventType.contains("payment_failed")
@@ -190,7 +201,7 @@ public class PaymentServiceImpl implements PaymentService {
                                     orderRepo.save(order);
                                 } else {
                                     log.error("Order {} does not belong to customerId : {}", orderId, customerId);
-                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMER_ID_STRING, customerId);
+                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMERID_STRING, customerId);
                                 }
                             },
                             () -> {
@@ -199,7 +210,7 @@ public class PaymentServiceImpl implements PaymentService {
                             }
                     );
         }
-        else throw new APIException("Webhook received with invalid data");
+        else throw new APIException("Webhook received with invalid data", HttpStatus.BAD_REQUEST);
     }
 
     /**

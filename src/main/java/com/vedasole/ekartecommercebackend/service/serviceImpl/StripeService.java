@@ -8,11 +8,11 @@ import com.stripe.param.checkout.SessionCreateParams;
 import com.vedasole.ekartecommercebackend.entity.*;
 import com.vedasole.ekartecommercebackend.repository.AddressRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,23 +20,21 @@ import static com.vedasole.ekartecommercebackend.utility.AppConstant.OrderStatus
 
 @Service
 @Transactional
+@Slf4j
 public class StripeService {
 
     @Value("${frontendDomainUrl:http://localhost:5173}")
     private String frontendDomainUrl;
-    @Value("${stripeApiKey:sample-stripe-api-key}")
-    private String stripeApiKey;
     private final OrderRepo orderRepo;
     private final AddressRepo addressRepo;
 
-    public StripeService(OrderRepo orderRepo,
-                         AddressRepo addressRepo) {
+    public StripeService(
+            OrderRepo orderRepo,
+            AddressRepo addressRepo,
+            @Value("${stripeApiKey}") String stripeApiKey
+    ) {
         this.orderRepo = orderRepo;
         this.addressRepo = addressRepo;
-    }
-
-    @PostConstruct
-    public void init() {
         Stripe.apiKey = stripeApiKey;
     }
 
@@ -44,61 +42,10 @@ public class StripeService {
     public Session createCheckoutSession(
             ShoppingCart shoppingCart
     ) throws StripeException {
-        List<ShoppingCartItem> shoppingCartItemDtos = shoppingCart.getShoppingCartItems();
-        List<SessionCreateParams.LineItem> listItems = shoppingCartItemDtos.stream()
-                .map(item -> {
-                    if(item.getQuantity() > 0 && item.getQuantity() <= item.getProduct().getQtyInStock())
-                        return SessionCreateParams.LineItem.builder()
-                                .setQuantity(item.getQuantity())
-                                .setPriceData(
-                                        SessionCreateParams.LineItem.PriceData.builder()
-                                                .setCurrency("INR")
-                                                .setUnitAmount((long) (item.getProduct().getPrice() * (1 - (item.getProduct().getDiscount() / 100)))*100)
-                                                .setProductData(
-                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName(item.getProduct().getName())
-//                                                                .setDescription(item.getProduct().getDesc())
-                                                                .addImage(item.getProduct().getImage())
-                                                                .putMetadata("productId", Long.toString(item.getProduct().getProductId()))
-                                                                .putMetadata("SKU", item.getProduct().getSku())
-                                                                .build()
-                                                ).build()
-                                ).build();
-                    else return null;
-                }).toList();
 
+        List<SessionCreateParams.LineItem> lineItemList = generateLineItems(shoppingCart);
 
-//              TODO : Setup Address for Order from UI
-//                shoppingCart.getCustomer().getAddress()
-        Address address = addressRepo.save(new Address(
-                5,
-                "Address Line 1",
-                "Address Line 2",
-                "City",
-                "State",
-                "Country",
-                444101
-        ));
-
-        Order order = new Order(
-                101L,
-                shoppingCart.getCustomer(),
-                new ArrayList<>(),
-//              TODO : Setup Address for Order from UI
-//                shoppingCart.getCustomer().getAddress()
-                address,
-                shoppingCart.getTotal() - shoppingCart.getDiscount(),
-                ORDER_CREATED
-        );
-        Order savedOrder = orderRepo.save(order);
-        List<OrderItem> orderItems = shoppingCartItemDtos.stream()
-                .map(item -> new OrderItem(
-                        savedOrder,
-                        item.getProduct(),
-                        item.getQuantity()
-                )).toList();
-        savedOrder.setOrderItems(new ArrayList<>(orderItems));
-        orderRepo.save(savedOrder);
+        Order savedOrder = createOrder(shoppingCart);
         String orderId = Long.toString(savedOrder.getOrderId());
         String clientReferenceNumber = "CUST" + shoppingCart.getCustomer().getCustomerId() + "_" + orderId;
 
@@ -112,7 +59,7 @@ public class StripeService {
                 .putMetadata("customer_id", Long.toString(shoppingCart.getCustomer().getCustomerId()))
                 .setSuccessUrl(frontendDomainUrl + "/paymentConfirmation?success=true&session_id={CHECKOUT_SESSION_ID}&order_id=" + orderId + "&client_reference_id=" + clientReferenceNumber)
                 .setCancelUrl(frontendDomainUrl + "/paymentConfirmation?canceled=true&session_id={CHECKOUT_SESSION_ID}&order_id=" + orderId + "&client_reference_id=" + clientReferenceNumber)
-                .addAllLineItem(listItems)
+                .addAllLineItem(lineItemList)
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .build();
 
@@ -122,5 +69,73 @@ public class StripeService {
                 .build();
 
         return Session.create(params, requestOptions);
+    }
+
+    private Order createOrder(ShoppingCart shoppingCart) {
+
+//              TODO : Setup Address for Order from UI
+//                shoppingCart.getCustomer().getAddress()
+        Address address = addressRepo.save(new Address(
+                5,
+                "Address Line 1",
+                "Address Line 2",
+                "City",
+                "State",
+                "Country",
+                444101
+        ));
+
+        double totalAmount = shoppingCart.getTotal() - shoppingCart.getDiscount();
+        log.debug("Shopping Cart Total: {}, Discount: {}, Final Order Amount: {}", shoppingCart.getTotal(), shoppingCart.getDiscount(), totalAmount);
+        log.debug("Creating order for Shopping Cart: {}", shoppingCart);
+
+        Order order = new Order(
+                101L,
+                shoppingCart.getCustomer(),
+                new ArrayList<>(),
+//              TODO : Setup Address for Order from UI
+//                shoppingCart.getCustomer().getAddress()
+                address,
+                totalAmount,
+                ORDER_CREATED
+        );
+        Order savedOrder = orderRepo.save(order);
+        List<OrderItem> orderItems = shoppingCart.getShoppingCartItems().stream()
+                .map(item -> new OrderItem(
+                        savedOrder,
+                        item.getProduct(),
+                        item.getQuantity()
+                )).toList();
+        savedOrder.setOrderItems(new ArrayList<>(orderItems));
+        orderRepo.save(savedOrder);
+        log.debug("Order created with ID: {}, Total Amount: {}", savedOrder.getOrderId(), savedOrder.getTotal());
+        return savedOrder;
+    }
+
+    private List<SessionCreateParams.LineItem> generateLineItems(ShoppingCart shoppingCart) {
+        return shoppingCart.getShoppingCartItems().stream()
+                .map(item -> {
+                    if(item.getQuantity() > 0 && item.getQuantity() <= item.getProduct().getQtyInStock())
+                        return SessionCreateParams.LineItem.builder()
+                                .setQuantity(item.getQuantity())
+                                .setPriceData(generatePriceData(item))
+                                .build();
+                    else return null;
+                }).toList();
+    }
+
+    private SessionCreateParams.LineItem.PriceData generatePriceData(ShoppingCartItem item) {
+        return SessionCreateParams.LineItem.PriceData.builder()
+                .setCurrency("INR")
+                .setUnitAmount((long) (item.getProduct().getPrice() * (1 - (item.getProduct().getDiscount() / 100))) * 100)
+                .setProductData(
+                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                .setName(item.getProduct().getName())
+//                                                                .setDescription(item.getProduct().getDesc())
+                                .addImage(item.getProduct().getImage())
+                                .putMetadata("productId", Long.toString(item.getProduct().getProductId()))
+                                .putMetadata("SKU", item.getProduct().getSku())
+                                .build()
+                ).build();
     }
 }

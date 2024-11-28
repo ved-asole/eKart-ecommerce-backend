@@ -55,30 +55,24 @@ public class PaymentController {
     ) {
         log.info("Webhook received with sigHeader: {}", sigHeader);
         Event event;
+        Map<String, Object> eventMap = gsonJsonParser.parseMap(payload);
+        log.info("event_id : {}, event_type: {}", eventMap.get("id"), eventMap.get("type"));
+        String type=eventMap.get("type").toString();
         try {
             // Verify the signature
             Webhook.Signature.verifyHeader(payload, sigHeader, endpointSecret, 300L);
             log.debug("Webhook received and verified header: {}", sigHeader);
 
             event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
-//            Event event = StripeObject.deserializeStripeObject(payload, Event.class, null);
             log.info("Event received with id: {}, type: {}", event.getId(), event.getType());
-
-            Map<String, Object> payloadMap = gsonJsonParser.parseMap(payload);
-
-            if (event.getType().contains("checkout.session")) paymentService.handleCheckoutSessionEvents(payloadMap);
-            if (event.getType().contains("payment_intent")) paymentService.handlePaymentIntentEvents(payloadMap);
-            else paymentService.handleStripeEvents(payloadMap);
 
         } catch (SignatureVerificationException e) {
             // Invalid signature
-            log.error("Webhook signature verification failed: {}", sigHeader, e);
+            log.error("Webhook signature verification failed: sigHeader[{}]", sigHeader, e);
         }
-        Map<String, Object> payloadMap = gsonJsonParser.parseMap(payload);
-        String type = payloadMap.get("type").toString();
-        if (type.contains("checkout.session")) paymentService.handleCheckoutSessionEvents(payloadMap);
-        if (type.contains("payment_intent")) paymentService.handlePaymentIntentEvents(payloadMap);
-        else paymentService.handleStripeEvents(payloadMap);
+        if (type.contains("checkout.session")) paymentService.handleCheckoutSessionEvents(eventMap);
+        if (type.contains("payment_intent")) paymentService.handlePaymentIntentEvents(eventMap);
+        else paymentService.handleStripeEvents(eventMap);
     }
 
 }
