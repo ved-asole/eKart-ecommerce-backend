@@ -2,26 +2,21 @@ package com.vedasole.ekartecommercebackend.exception;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 @Setter
 @Getter
+@Slf4j
 public class APIException extends RuntimeException {
 
-    private static final Logger logger = LoggerFactory.getLogger(APIException.class);
-    public String message;
-    public HttpStatus httpStatus;
-
-    public APIException() {
-        this.message = "Error Response";
-        this.httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    }
+    private final String message;
+    private final HttpStatus httpStatus;
 
     public APIException(String message) {
         super(message);
         this.message = message;
+        this.httpStatus= HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
     public APIException(String message, HttpStatus httpStatus) {
@@ -33,11 +28,7 @@ public class APIException extends RuntimeException {
     public APIException(String message, Throwable cause) {
         super(message, cause);
         this.message = message;
+        this.httpStatus= HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
-    public APIException(String message, Throwable cause, HttpStatus httpStatus) {
-        super(message, cause);
-        this.message = message;
-        this.httpStatus = httpStatus;
-    }
 }
