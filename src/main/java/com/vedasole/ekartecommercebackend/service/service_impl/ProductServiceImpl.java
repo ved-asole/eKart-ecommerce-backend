@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
 import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.entity.Product;
@@ -6,7 +6,7 @@ import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.ProductDto;
 import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
 import com.vedasole.ekartecommercebackend.repository.ProductRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ProductService;
+import com.vedasole.ekartecommercebackend.service.service_interface.ProductService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;

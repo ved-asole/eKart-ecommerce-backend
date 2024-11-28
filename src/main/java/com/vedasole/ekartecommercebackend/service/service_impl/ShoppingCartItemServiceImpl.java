@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
 import com.vedasole.ekartecommercebackend.entity.Product;
 import com.vedasole.ekartecommercebackend.entity.ShoppingCart;
@@ -8,8 +8,8 @@ import com.vedasole.ekartecommercebackend.payload.ProductDto;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartItemDto;
 import com.vedasole.ekartecommercebackend.repository.ShoppingCartItemRepo;
 import com.vedasole.ekartecommercebackend.repository.ShoppingCartRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ProductService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ShoppingCartItemService;
+import com.vedasole.ekartecommercebackend.service.service_interface.ProductService;
+import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartItemService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.*;
+import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.SHOPPING_CART;
+import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.SHOPPING_CART_ITEM;
 
 @Service
 @AllArgsConstructor

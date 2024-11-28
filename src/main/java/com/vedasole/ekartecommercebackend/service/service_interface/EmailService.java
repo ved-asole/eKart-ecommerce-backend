@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceInterface;
+package com.vedasole.ekartecommercebackend.service.service_interface;
 
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;

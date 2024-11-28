@@ -1,6 +1,6 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
-import com.vedasole.ekartecommercebackend.service.serviceInterface.EmailService;
+import com.vedasole.ekartecommercebackend.service.service_interface.EmailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;

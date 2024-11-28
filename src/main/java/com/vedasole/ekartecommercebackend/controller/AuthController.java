@@ -4,7 +4,7 @@ import com.vedasole.ekartecommercebackend.payload.ApiResponse;
 import com.vedasole.ekartecommercebackend.payload.AuthenticationRequest;
 import com.vedasole.ekartecommercebackend.payload.AuthenticationResponse;
 import com.vedasole.ekartecommercebackend.payload.PasswordResetRequestDto;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.AuthenticationService;
+import com.vedasole.ekartecommercebackend.service.service_interface.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

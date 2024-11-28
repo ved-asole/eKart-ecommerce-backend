@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vedasole.ekartecommercebackend.config.TestMailConfig;
 import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryService;
+import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
 import com.vedasole.ekartecommercebackend.entity.PasswordResetToken;
 import com.vedasole.ekartecommercebackend.entity.User;
@@ -9,10 +9,10 @@ import com.vedasole.ekartecommercebackend.payload.CustomerDto;
 import com.vedasole.ekartecommercebackend.repository.PasswordResetTokenRepo;
 import com.vedasole.ekartecommercebackend.repository.UserRepo;
 import com.vedasole.ekartecommercebackend.security.JwtService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.AuthenticationService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.CustomerService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.EmailService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.UserService;
+import com.vedasole.ekartecommercebackend.service.service_interface.AuthenticationService;
+import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
+import com.vedasole.ekartecommercebackend.service.service_interface.EmailService;
+import com.vedasole.ekartecommercebackend.service.service_interface.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
+
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

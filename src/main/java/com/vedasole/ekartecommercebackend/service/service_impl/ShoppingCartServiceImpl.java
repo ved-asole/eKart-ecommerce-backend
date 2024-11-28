@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
 import com.vedasole.ekartecommercebackend.entity.Customer;
 import com.vedasole.ekartecommercebackend.entity.ShoppingCart;
@@ -10,8 +10,8 @@ import com.vedasole.ekartecommercebackend.payload.ShoppingCartItemDto;
 import com.vedasole.ekartecommercebackend.repository.CustomerRepo;
 import com.vedasole.ekartecommercebackend.repository.ShoppingCartItemRepo;
 import com.vedasole.ekartecommercebackend.repository.ShoppingCartRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ShoppingCartItemService;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ShoppingCartService;
+import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartItemService;
+import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,8 @@
-package com.vedasole.ekartecommercebackend.service.serviceInterface;
+package com.vedasole.ekartecommercebackend.service.service_interface;
 
 import com.stripe.model.checkout.Session;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
+
 import java.util.Map;
 
 public interface PaymentService {

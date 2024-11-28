@@ -1,12 +1,15 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
-import com.vedasole.ekartecommercebackend.entity.*;
+import com.vedasole.ekartecommercebackend.entity.Address;
+import com.vedasole.ekartecommercebackend.entity.Customer;
+import com.vedasole.ekartecommercebackend.entity.Order;
+import com.vedasole.ekartecommercebackend.entity.OrderItem;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.OrderDto;
 import com.vedasole.ekartecommercebackend.repository.CustomerRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderItemRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.OrderService;
+import com.vedasole.ekartecommercebackend.service.service_interface.OrderService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;

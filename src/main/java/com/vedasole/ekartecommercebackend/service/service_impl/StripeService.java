@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;

@@ -2,7 +2,7 @@ package com.vedasole.ekartecommercebackend.utility;
 
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.CustomerService;
+import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

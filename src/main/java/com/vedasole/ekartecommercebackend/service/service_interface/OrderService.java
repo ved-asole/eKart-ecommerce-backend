@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceInterface;
+package com.vedasole.ekartecommercebackend.service.service_interface;
 
 import com.vedasole.ekartecommercebackend.entity.Order;
 import com.vedasole.ekartecommercebackend.payload.OrderDto;

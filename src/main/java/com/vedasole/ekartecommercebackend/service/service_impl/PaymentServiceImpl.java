@@ -1,4 +1,4 @@
-package com.vedasole.ekartecommercebackend.service.serviceImpl;
+package com.vedasole.ekartecommercebackend.service.service_impl;
 
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -8,7 +8,7 @@ import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.*;
+import com.vedasole.ekartecommercebackend.service.service_interface.*;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

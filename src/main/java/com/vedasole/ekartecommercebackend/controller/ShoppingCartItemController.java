@@ -1,7 +1,7 @@
 package com.vedasole.ekartecommercebackend.controller;
 
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartItemDto;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ShoppingCartItemService;
+import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;

@@ -5,7 +5,7 @@ import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.PaymentService;
+import com.vedasole.ekartecommercebackend.service.service_interface.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

@@ -3,7 +3,7 @@ package com.vedasole.ekartecommercebackend.IT;
 import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.CategoryService;
+import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

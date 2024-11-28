@@ -2,7 +2,7 @@ package com.vedasole.ekartecommercebackend.controller;
 
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartItemDto;
-import com.vedasole.ekartecommercebackend.service.serviceInterface.ShoppingCartService;
+import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
