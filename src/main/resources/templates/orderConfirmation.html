@@ -79,7 +79,7 @@
             </div>
             <div class="order-detail">
                 <strong>Total Amount:</strong>
-                ₹<span th:text="${order.total}"></span>
+                <span th:text="${#numbers.formatCurrency(order.total)}"></span>
             </div>
         </div>
 
@@ -96,7 +96,7 @@
             <tr th:each="item : ${order.orderItems}">
                 <td th:text="${item.product.name}"></td>
                 <td th:text="${item.quantity}"></td>
-                <td>₹<span th:text="${item.product.price}"></span></td>
+                <td th:text="${#numbers.formatCurrency(item.product.price)}"></td>
             </tr>
             </tbody>
         </table>
