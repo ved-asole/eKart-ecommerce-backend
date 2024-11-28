@@ -99,12 +99,13 @@ public class Order {
     }
 
     public void calculateTotal() {
-        setTotal(0);
+        this.total=0;
         if(!(orderItems == null || orderItems.isEmpty())) {
-            orderItems.forEach(orderItem -> {
-                double totalProductValue = orderItem.getProduct().getPrice() * orderItem.getQuantity();
-                setTotal(getTotal() + totalProductValue);
-            });
+            this.total = orderItems.stream()
+                    .mapToDouble(orderItem -> {
+                        double finalPrice = orderItem.getProduct().getPrice() / 100 * (100 - orderItem.getProduct().getDiscount());
+                        return finalPrice * orderItem.getQuantity();
+                    }).reduce(0, Double::sum);
         }
     }
 
