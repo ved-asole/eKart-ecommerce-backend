@@ -4,6 +4,7 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
+import com.vedasole.ekartecommercebackend.exception.APIException;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
 import com.vedasole.ekartecommercebackend.service.service_interface.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -53,26 +54,30 @@ public class PaymentController {
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader
     ) {
-        log.info("Webhook received with sigHeader: {}", sigHeader);
-        Event event;
-        Map<String, Object> eventMap = gsonJsonParser.parseMap(payload);
-        log.info("event_id : {}, event_type: {}", eventMap.get("id"), eventMap.get("type"));
-        String type=eventMap.get("type").toString();
+        log.debug("Webhook received with sigHeader: {}", sigHeader);
         try {
             // Verify the signature
             Webhook.Signature.verifyHeader(payload, sigHeader, endpointSecret, 300L);
             log.debug("Webhook received and verified header: {}", sigHeader);
 
-            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
-            log.info("Event received with id: {}, type: {}", event.getId(), event.getType());
+            Event event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+            log.info("event_id : {}, event_type: {}", event.getId(), event.getType());
+
+            Map<String, Object> payloadMap = gsonJsonParser.parseMap(payload);
+            if (payloadMap == null) {
+                log.error("Invalid payload format: {}", payload);
+                throw new APIException("Invalid payload format", HttpStatus.BAD_REQUEST);
+            }
+
+            if (event.getType().contains("checkout.session")) paymentService.handleCheckoutSessionEvents(payloadMap);
+            if (event.getType().contains("payment_intent")) paymentService.handlePaymentIntentEvents(payloadMap);
+            else paymentService.handleStripeEvents(payloadMap);
 
         } catch (SignatureVerificationException e) {
             // Invalid signature
-            log.error("Webhook signature verification failed: sigHeader[{}]", sigHeader, e);
+            log.error("Event signature verification failed: sigHeader[{}]", sigHeader, e);
+            throw new APIException("Invalid Event - signature verification failed", HttpStatus.BAD_REQUEST);
         }
-        if (type.contains("checkout.session")) paymentService.handleCheckoutSessionEvents(eventMap);
-        if (type.contains("payment_intent")) paymentService.handlePaymentIntentEvents(eventMap);
-        else paymentService.handleStripeEvents(eventMap);
     }
 
 }
