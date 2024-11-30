@@ -2,7 +2,9 @@ package com.vedasole.ekartecommercebackend.controller;
 
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
+import com.stripe.net.LiveStripeResponseGetter;
 import com.stripe.net.Webhook;
 import com.vedasole.ekartecommercebackend.exception.APIException;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
@@ -10,13 +12,11 @@ import com.vedasole.ekartecommercebackend.service.service_interface.PaymentServi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payment")
@@ -34,7 +34,6 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private static final GsonJsonParser gsonJsonParser = new GsonJsonParser();
     @Value("${stripe.endpoint.secret}")
     private String endpointSecret;
 
@@ -63,20 +62,23 @@ public class PaymentController {
             Event event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
             log.info("event_id : {}, event_type: {}", event.getId(), event.getType());
 
-            Map<String, Object> payloadMap = gsonJsonParser.parseMap(payload);
-            if (payloadMap == null) {
-                log.error("Invalid payload format: {}", payload);
-                throw new APIException("Invalid payload format", HttpStatus.BAD_REQUEST);
-            }
+            StripeObject stripeObject = StripeObject.deserializeStripeObject(
+                    event.getData().getObject().toJson(),
+                    event.getData().getObject().getClass(),
+                    new LiveStripeResponseGetter()
+            );
 
-            if (event.getType().contains("checkout.session")) paymentService.handleCheckoutSessionEvents(payloadMap);
-            if (event.getType().contains("payment_intent")) paymentService.handlePaymentIntentEvents(payloadMap);
-            else paymentService.handleStripeEvents(payloadMap);
+            paymentService.handleStripeEvent(stripeObject);
+            log.info("Event processed successfully: {}", event.getId());
 
         } catch (SignatureVerificationException e) {
             // Invalid signature
             log.error("Event signature verification failed: sigHeader[{}]", sigHeader, e);
-            throw new APIException("Invalid Event - signature verification failed", HttpStatus.BAD_REQUEST);
+            throw new APIException("Invalid Event- signature verification failed", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // Other exceptions
+            log.error("Error processing event: {}", e.getMessage(), e);
+            throw new APIException("Error processing event", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

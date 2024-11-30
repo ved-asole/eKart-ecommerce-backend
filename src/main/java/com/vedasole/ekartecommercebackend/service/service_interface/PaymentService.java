@@ -1,18 +1,18 @@
 package com.vedasole.ekartecommercebackend.service.service_interface;
 
+import com.stripe.model.PaymentIntent;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
-
-import java.util.Map;
 
 public interface PaymentService {
 
     Session createCheckoutSession(ShoppingCartDto shoppingCartDto);
 
-    void handleCheckoutSessionEvents(Map<String, Object> payloadMap);
+    void handleCheckoutSessionEvent(Session session);
 
-    void handlePaymentIntentEvents(Map<String, Object> payloadMap);
+    void handlePaymentIntentEvent(PaymentIntent paymentIntent);
 
-    void handleStripeEvents(Map<String, Object> payloadMap);
+    void handleStripeEvent(StripeObject stripeObject);
 
 }

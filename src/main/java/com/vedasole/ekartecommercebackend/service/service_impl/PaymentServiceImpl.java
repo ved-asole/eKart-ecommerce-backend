@@ -1,6 +1,8 @@
 package com.vedasole.ekartecommercebackend.service.service_impl;
 
 import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.vedasole.ekartecommercebackend.entity.ShoppingCart;
 import com.vedasole.ekartecommercebackend.exception.APIException;
@@ -12,7 +14,6 @@ import com.vedasole.ekartecommercebackend.service.service_interface.*;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
     private static final String CUSTOMERID_STRING = "customerId";
     private static final String CUSTOMER_ID_STRING = "customer_id";
     private static final String ORDER_STRING = "Order";
+    private static final String INVALID_WEBHOOK_MSG = "Invalid webhook event received";
 
     /**
      * This method creates a Stripe checkout session for the provided shopping cart.
@@ -62,59 +64,84 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     /**
-     * This method handles the checkout session events received from the Stripe webhook.
+     * This method handles the Stripe webhook events.
      *
-     * @param payloadMap The payload map containing the event data.
+     * @param stripeObject The Stripe event object received from Stripe.
+     * @throws APIException If an error occurs while handling the webhook events.
      */
     @Override
     @Transactional
-    public void handleCheckoutSessionEvents(Map<String, Object> payloadMap) {
-        Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
-        Map<String, Object> metadataObjectMap = (Map<String, Object>) dataObjectMap.get("metadata");
-        log.debug(
-                "Checkout session event received with client_reference_id[{}], order_id[{}], customer_id[{}], payment_status[{}]",
-                dataObjectMap.get("client_reference_id"),
-                metadataObjectMap.get(ORDER_ID_STRING),
-                metadataObjectMap.get(CUSTOMER_ID_STRING),
-                dataObjectMap.get("payment_status")
-        );
-
-        if (
-                dataObjectMap.get("status").equals("complete")
-                && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
-                && metadataObjectMap.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString()) > 0
-        ) {
-            handleCompletedCheckoutSessionEvent(metadataObjectMap);
-        } else if (
-                dataObjectMap.get("status").equals("expired")
-                && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
-                && metadataObjectMap.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString()) > 0
-        ) {
-            long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
-            long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
-            orderRepo.findById(orderId)
-                    .ifPresentOrElse(
-                            order -> {
-                                if (order.getCustomer().getCustomerId() == customerId) {
-                                    order.setOrderStatus(AppConstant.OrderStatus.ORDER_EXPIRED);
-                                    orderRepo.save(order);
-                                } else {
-                                    log.error("Order {} does not belong to same customerId : {}", orderId, customerId);
-                                    throw new ResourceNotFoundException(ORDER_STRING, CUSTOMERID_STRING, customerId);
-                                }
-                            },
-                            () -> {
-                                log.error("Order not found in expired checkout session event with id : {}", orderId);
-                                throw new ResourceNotFoundException(ORDER_STRING, "id", customerId);
-                            }
-                    );
+    public void handleStripeEvent(StripeObject stripeObject) {
+        if (stripeObject instanceof Session session) this.handleCheckoutSessionEvent(session);
+        else if (stripeObject instanceof PaymentIntent paymentIntent) this.handlePaymentIntentEvent(paymentIntent);
+        else {
+            log.info("Stripe Event received with data: {}", stripeObject.toJson());
+            throw new APIException(INVALID_WEBHOOK_MSG, HttpStatus.BAD_REQUEST);
         }
-        else throw new APIException("Webhook received with invalid data", HttpStatus.BAD_REQUEST);
     }
 
-    private void handleCompletedCheckoutSessionEvent(Map<String, Object> metadataObjectMap) {
-        long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
-        long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
+    /**
+     * This method handles the checkout session event.
+     *
+     * @param session The metadata of the completed checkout session.
+     * @throws APIException If an error occurs while handling the completed checkout session.
+     */
+    @Override
+    public void handleCheckoutSessionEvent(Session session) {
+        Map<String, String> metadata = session.getMetadata();
+        log.debug(
+                "Checkout session event received with client_reference_id[{}], order_id[{}], customer_id[{}], status[{}]",
+                session.getClientReferenceId(),
+                metadata.get(ORDER_ID_STRING),
+                metadata.get(CUSTOMER_ID_STRING),
+                session.getPaymentStatus()
+        );
+
+        if ( metadata.get(ORDER_ID_STRING) != null && Long.parseLong(metadata.get(ORDER_ID_STRING)) > 0
+                && metadata.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadata.get(CUSTOMER_ID_STRING)) > 0
+        ) {
+            if(session.getStatus().equals("complete")) handleCompletedCheckoutSession(metadata);
+            else if(session.getStatus().equals("expired")) handleExpiredCheckoutSession(metadata);
+        }
+        else throw new APIException(INVALID_WEBHOOK_MSG, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * This method handles the expired checkout session event.
+     *
+     * @param metadata The metadata of the expired checkout session.
+     * @throws APIException If an error occurs while handling the expired checkout session.
+     */
+    private void handleExpiredCheckoutSession(Map<String, String> metadata) {
+        long orderId = Long.parseLong(metadata.get(ORDER_ID_STRING));
+        long customerId = Long.parseLong(metadata.get(CUSTOMER_ID_STRING));
+        orderRepo.findById(orderId)
+                .ifPresentOrElse(
+                        order -> {
+                            if (order.getCustomer().getCustomerId() == customerId) {
+                                order.setOrderStatus(AppConstant.OrderStatus.ORDER_EXPIRED);
+                                orderRepo.save(order);
+                            } else {
+                                log.error("Order {} does not belong to same customerId : {}", orderId, customerId);
+                                throw new ResourceNotFoundException(ORDER_STRING, CUSTOMERID_STRING, customerId);
+                            }
+                        },
+                        () -> {
+                            log.error("Order not found in expired checkout session event with id : {}", orderId);
+                            throw new ResourceNotFoundException(ORDER_STRING, "id", customerId);
+                        }
+                );
+    }
+
+    /**
+     * This method handles the completed checkout session event.
+     *
+     * @param metadata The metadata of the completed checkout session.
+     * @throws APIException If an error occurs while handling the completed checkout session.
+     */
+    private void handleCompletedCheckoutSession(Map<String, String> metadata) {
+        long orderId = Long.parseLong(metadata.get(ORDER_ID_STRING));
+        long customerId = Long.parseLong(metadata.get(CUSTOMER_ID_STRING));
         orderRepo.findById(orderId)
                 .ifPresentOrElse(
                         order -> {
@@ -162,37 +189,29 @@ public class PaymentServiceImpl implements PaymentService {
                 );
     }
 
-    private static Map<String, Object> getDataObjectMap(Map<String, Object> payloadMap) {
-        Map<String, Object> dataMap = (Map<String, Object>) payloadMap.get("data");
-        return (Map<String, Object>) dataMap.get("object");
-    }
-
     /**
-     * This method handles the payment intent events received from the Stripe webhook.
+     * This method handles the payment intent events.
      *
-     * @param payloadMap The payload map containing the event data.
+     * @param paymentIntent The payment intent object received from Stripe.
+     * @throws APIException If an error occurs while handling the payment intent events.
      */
     @Override
-    @Transactional
-    public void handlePaymentIntentEvents(Map<String, Object> payloadMap) {
-        String eventType = payloadMap.get("type").toString();
-        Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
-        Map<String, Object> metadataObjectMap = (Map<String, Object>) dataObjectMap.get("metadata");
+    public void handlePaymentIntentEvent(PaymentIntent paymentIntent) {
+        Map<String, String> metadata = paymentIntent.getMetadata();
         log.debug(
-                "Payment Intent event received with client_reference_id[{}], order_id[{}], customer_id[{}], payment_status[{}]",
-                dataObjectMap.get("client_reference_id"),
-                metadataObjectMap.get(ORDER_ID_STRING),
-                metadataObjectMap.get(CUSTOMER_ID_STRING),
-                dataObjectMap.get("payment_status")
+                "Payment Intent event received for order_id[{}], customer_id[{}], status[{}]",
+                metadata.get(ORDER_ID_STRING),
+                metadata.get(CUSTOMER_ID_STRING),
+                paymentIntent.getStatus()
         );
 
         if (
-                eventType.contains("payment_failed")
-                        && metadataObjectMap.get(ORDER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString()) > 0
-                        && metadataObjectMap.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString()) > 0
+                paymentIntent.getStatus().equals("canceled")
+                        && metadata.get(ORDER_ID_STRING) != null && Long.parseLong(metadata.get(ORDER_ID_STRING)) > 0
+                        && metadata.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadata.get(CUSTOMER_ID_STRING)) > 0
         ) {
-            long orderId = Long.parseLong(metadataObjectMap.get(ORDER_ID_STRING).toString());
-            long customerId = Long.parseLong(metadataObjectMap.get(CUSTOMER_ID_STRING).toString());
+            long orderId = Long.parseLong(metadata.get(ORDER_ID_STRING));
+            long customerId = Long.parseLong(metadata.get(CUSTOMER_ID_STRING));
             orderRepo.findById(orderId)
                     .ifPresentOrElse(
                             order -> {
@@ -210,20 +229,6 @@ public class PaymentServiceImpl implements PaymentService {
                             }
                     );
         }
-        else throw new APIException("Webhook received with invalid data", HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * This method handles the Stripe events received from the Stripe webhook.
-     *
-     * @param payloadMap The payload map containing the event data.
-     */
-    @Override
-    public void handleStripeEvents(Map<String, Object> payloadMap) {
-        Map<String, Object> dataObjectMap = getDataObjectMap(payloadMap);
-
-        log.info("object_id : {}", dataObjectMap.get("id"));
-        JSONObject dataObject = new JSONObject(dataObjectMap);
-        dataObject.forEach((k, v) -> log.info("dataObject : key : {}, value : {}", k, dataObject.get(k)));
+        else throw new APIException(INVALID_WEBHOOK_MSG, HttpStatus.BAD_REQUEST);
     }
 }
