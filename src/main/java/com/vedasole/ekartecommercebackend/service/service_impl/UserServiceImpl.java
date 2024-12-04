@@ -6,8 +6,7 @@ import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.repository.UserRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.UserService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -20,11 +19,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Override
     public User createUser(User user) {

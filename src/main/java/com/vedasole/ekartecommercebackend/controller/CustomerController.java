@@ -8,8 +8,7 @@ import com.vedasole.ekartecommercebackend.security.JwtService;
 import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
 import com.vedasole.ekartecommercebackend.service.service_interface.UserService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -35,12 +34,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/v1/customers")
 @CrossOrigin(value = {"http://localhost:5173","https://ekart.vedasole.cloud","https://ekart-shopping.netlify.app","https://develop--ekart-shopping.netlify.app"}, allowCredentials = "true", exposedHeaders = {"Authorization"})
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerController {
 
     private final CustomerService customerService;
     private final JwtService jwtService;
     private final UserService userService;
-    private final Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
     /**
      * Creates a new customer.
@@ -52,19 +51,19 @@ public class CustomerController {
     public ResponseEntity<EntityModel<CustomerDto>> createCustomer(
             @Valid @RequestBody CustomerDto customerDto
     ) {
-        logger.debug("New Customer request received with email : {}", customerDto.getEmail());
-        logger.debug("New Customer request received : {}", customerDto);
+        log.debug("New Customer request received with email : {}", customerDto.getEmail());
+        log.debug("New Customer request received : {}", customerDto);
         try {
             this.customerService.getCustomerByEmail(customerDto.getEmail());
             this.userService.getUserByEmail(customerDto.getEmail());
         }catch(ResourceNotFoundException re) {
-            logger.debug("No customer with this email found");
+            log.debug("No customer with this email found");
         } catch (Exception e) {
             throw new APIException("A customer with this email already exists");
         }
 
         CustomerDto createdCustomer = this.customerService.createCustomer(customerDto);
-        logger.debug("New Customer created : {}", createdCustomer.getEmail());
+        log.debug("New Customer created : {}", createdCustomer.getEmail());
         String jwt = this.jwtService.generateToken(this.userService.getUserByEmail(customerDto.getEmail()));
         Link selfLink = linkTo(methodOn(CustomerController.class).getCustomer(createdCustomer.getCustomerId())).withSelfRel();
         Link customersLink = linkTo(methodOn(CustomerController.class).getAllCustomers()).withRel(CUSTOMERS.getValue());

@@ -11,8 +11,7 @@ import com.vedasole.ekartecommercebackend.repository.ShoppingCartRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.ProductService;
 import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartItemService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -26,12 +25,12 @@ import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.S
 @Service
 @AllArgsConstructor
 @Transactional
+@Slf4j
 public class ShoppingCartItemServiceImpl implements ShoppingCartItemService {
 
     private final ShoppingCartItemRepo shoppingCartItemRepo;
     private final ProductService productService;
     private final ShoppingCartRepo shoppingCartRepo;
-    private final Logger log = LoggerFactory.getLogger(ShoppingCartItemServiceImpl.class);
 
     
     /**

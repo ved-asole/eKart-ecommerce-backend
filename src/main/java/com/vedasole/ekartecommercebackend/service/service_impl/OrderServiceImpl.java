@@ -11,9 +11,8 @@ import com.vedasole.ekartecommercebackend.repository.OrderItemRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.OrderService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,13 +27,13 @@ import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.O
 @Service
 @AllArgsConstructor
 @Transactional
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepo orderRepo;
     private final CustomerRepo customerRepo;
     private final OrderItemRepo orderItemsRepo;
     private final ModelMapper modelMapper;
-    private final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     
     /**

@@ -6,8 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -19,10 +18,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@Slf4j
 public class JwtService {
 
     private final String jwtSecretKey;
-    Logger log  = LoggerFactory.getLogger(JwtService.class);
 
     public JwtService(@Value("${jwt.secret.key}") String jwtSecretKey) {
         this.jwtSecretKey = jwtSecretKey;
@@ -105,6 +104,7 @@ public class JwtService {
             return false;
         }
         catch (Exception e) {
+            log.error("Unable to check token validity: {}", e.getMessage());
             return false;
         }
     }

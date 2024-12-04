@@ -13,8 +13,7 @@ import com.vedasole.ekartecommercebackend.repository.ShoppingCartRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartItemService;
 import com.vedasole.ekartecommercebackend.service.service_interface.ShoppingCartService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +27,13 @@ import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.S
 @Service
 @AllArgsConstructor
 @Transactional
+@Slf4j
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     private final ShoppingCartRepo shoppingCartRepo;
     private final CustomerRepo customerRepo;
     private final ShoppingCartItemRepo shoppingCartItemRepo;
     private final ShoppingCartItemService shoppingCartItemService;
-    private final Logger log = LoggerFactory.getLogger(ShoppingCartServiceImpl.class);
 
     /**
      * This method creates a new shopping cart for the given user.
