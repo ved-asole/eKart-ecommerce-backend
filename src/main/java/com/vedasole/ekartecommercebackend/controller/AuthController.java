@@ -28,7 +28,7 @@ import javax.validation.Valid;
 @CrossOrigin(
         value = {
                 "http://localhost:5173",
-                "https://ekart.vedasole.cloud",
+                "https://ekart.vedasole.me",
                 "https://ekart-shopping.netlify.app",
                 "https://develop--ekart-shopping.netlify.app"
         },
