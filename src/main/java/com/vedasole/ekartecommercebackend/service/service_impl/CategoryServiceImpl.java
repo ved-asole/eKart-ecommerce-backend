@@ -69,12 +69,14 @@ public class CategoryServiceImpl implements CategoryService {
         categoryInDB.setName(category.getName());
         categoryInDB.setImage(category.getImage());
         categoryInDB.setDesc(category.getDesc());
-        if(categoryInDB.getParentCategory() !=  null) {
-            Category parentCategory = categoryRepo.findById(categoryInDB.getParentCategory().getCategoryId())
+        if(category.getParentCategory() !=  null) {
+            Category parentCategory = categoryRepo.findById(category.getParentCategory().getCategoryId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             CATEGORY.getValue(), "id", category.getParentCategory().getCategoryId())
                     );
             categoryInDB.setParentCategory(parentCategory);
+        } else {
+            categoryInDB.setParentCategory(null);
         }
         categoryInDB.setActive(category.isActive());
 
@@ -129,7 +131,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
-     * @param category
+     * This method converts Category to CategoryDto
+     * @param category Category
      * @return CategoryDto
      */
     @Override
@@ -138,8 +141,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
-     *
-     * @param categoryDto
+     * This method converts CategoryDto to Category
+     * @param categoryDto CategoryDto
      * @return Category
      */
     @Override
@@ -148,7 +151,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private Category dtoToCategory(CategoryDto categoryDto){
-        return this.modelMapper.map(categoryDto, Category.class);
+        Category category = this.modelMapper.map(categoryDto, Category.class);
+        category.setParentCategory(categoryDto.getParentCategory());
+        return category;
     }
     private CategoryDto categoryToDto(Category category)
     {
