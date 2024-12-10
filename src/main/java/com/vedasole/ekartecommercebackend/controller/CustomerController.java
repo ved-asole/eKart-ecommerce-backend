@@ -9,6 +9,7 @@ import com.vedasole.ekartecommercebackend.service.service_interface.CustomerServ
 import com.vedasole.ekartecommercebackend.service.service_interface.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -154,6 +155,17 @@ public class CustomerController {
                 ),
                 HttpStatus.OK
         );
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<Page<CustomerDto>> getAllCustomers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "customerId") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder
+    ){
+        Page<CustomerDto> allCustomersByPage = this.customerService.getAllCustomersByPage(page, size, sortBy, sortOrder);
+        return new ResponseEntity<>(allCustomersByPage,HttpStatus.OK);
     }
 
 }

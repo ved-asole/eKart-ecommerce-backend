@@ -17,6 +17,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +58,10 @@ public class CustomerServiceImpl implements CustomerService {
      */
     @Override
     @CacheEvict(value = "allCustomers", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "allCustomers", allEntries = true),
+            @CacheEvict(value = "allCustomersPage", allEntries = true)
+    })
     public CustomerDto createCustomer(CustomerDto customerDto) {
         // Create a new user with the role of USER
         User user = new User(
@@ -113,7 +120,8 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "customers", key = "#customerId"),
-            @CacheEvict(value = "allCustomers", allEntries = true)
+            @CacheEvict(value = "allCustomers", allEntries = true),
+            @CacheEvict(value = "allCustomersPage", allEntries = true)
     })
     public CustomerDto updateCustomer(CustomerDto customerDto, Long customerId) {
 
@@ -158,7 +166,8 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = "customers", key = "#customerId"),
-            @CacheEvict(value = "allCustomers", allEntries = true)
+            @CacheEvict(value = "allCustomers", allEntries = true),
+            @CacheEvict(value = "allCustomersPage", allEntries = true)
     })
     public void deleteCustomer(Long customerId) {
         this.customerRepo.deleteById(customerId);
@@ -177,6 +186,20 @@ public class CustomerServiceImpl implements CustomerService {
                 .map(this::customerToDto)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "allCustomersPage",
+            key = "#page + '-' + #size + '-' + #sortBy + '-' + #sortOrder",
+            sync = true
+    )
+    public Page<CustomerDto> getAllCustomersByPage(int page, int size, String sortBy, String sortOrder) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortBy));
+        return this.customerRepo.findAll(pageRequest)
+                .map(this::customerToDto);
+    }
+
     /**
      * Returns a customer based on its ID.
      *
@@ -203,6 +226,7 @@ public class CustomerServiceImpl implements CustomerService {
      * @throws ResourceNotFoundException if the customer is not found
      */
     @Override
+    @Transactional(readOnly = true)
     public CustomerDto getCustomerByEmail(String email) {
         return this.customerRepo.findByEmail(email)
                 .map(this::customerToDto)
@@ -219,6 +243,7 @@ public class CustomerServiceImpl implements CustomerService {
      * @return the user associated with the customer
      */
     @Override
+    @Transactional(readOnly = true)
     public User getUserForCustomer(Long customerId) {
         return this.customerRepo.findById(customerId)
                 .map(Customer::getUser)
