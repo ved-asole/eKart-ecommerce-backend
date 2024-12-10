@@ -187,4 +187,21 @@ public class ProductController {
         );
     }
 
+    @GetMapping("/category/{categoryId}/page")
+    public ResponseEntity<Page<ProductDto>> getAllProductsByCategoryByPage(
+            @PathVariable long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "productId") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder
+    ){
+        Page<ProductDto> allProducts = this.productService.getAllProductsByCategoryPerPage(
+                categoryId, page, size, sortBy, sortOrder
+        );
+        return new ResponseEntity<>(
+                allProducts,
+                HttpStatus.OK
+        );
+    }
+
 }
