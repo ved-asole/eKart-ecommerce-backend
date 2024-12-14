@@ -187,4 +187,14 @@ public class ProductController {
         );
     }
 
+    /**
+     * Returns the total number of products in the system.
+     *
+     * @return the total number of products
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalProductsCount() {
+        return ResponseEntity.ok(this.productService.getTotalProductsCount());
+    }
+
 }
