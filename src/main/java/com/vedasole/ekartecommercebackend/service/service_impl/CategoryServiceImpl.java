@@ -100,6 +100,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
+     * Returns the total number of categories in the database.
+     *
+     * @return the total number of categories in the database
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long getTotalCategoriesCount() {
+        return this.categoryRepo.count();
+    }
+
+    /**
      * Returns a list of all categories in the database as CategoryDTOs.
      *
      * @return a list of all categories in the database as CategoryDTOs
