@@ -187,6 +187,7 @@ public class OrderServiceImpl implements OrderService {
      * @return the total number of orders.
      */
     @Override
+    @Transactional(readOnly = true)
     public Long getTotalOrdersCount() {
         return this.orderRepo.count();
     }
@@ -197,6 +198,7 @@ public class OrderServiceImpl implements OrderService {
      * @return the total income.
      */
     @Override
+    @Transactional(readOnly = true)
     public Long getTotalIncome() {
         Double totalIncome = this.orderRepo.getTotalIncome();
         return totalIncome.longValue();

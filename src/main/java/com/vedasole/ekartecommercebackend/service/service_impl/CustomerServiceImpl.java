@@ -233,6 +233,7 @@ public class CustomerServiceImpl implements CustomerService {
      * @return the total number of customers
      */
     @Override
+    @Transactional(readOnly = true)
     public Long getTotalCustomersCount() {
         return this.customerRepo.count();
     }

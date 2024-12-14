@@ -185,6 +185,7 @@ public class ProductServiceImpl implements ProductService {
      * @return the total number of Products
      */
     @Override
+    @Transactional(readOnly = true)
     public Long getTotalProductsCount() {
         return this.productRepo.count();
     }
