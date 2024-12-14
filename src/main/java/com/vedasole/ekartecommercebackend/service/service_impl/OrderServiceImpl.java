@@ -17,9 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CUSTOMER;
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.ORDER;
@@ -181,7 +182,41 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * This method converts a OrderDto object to a Order object.
+     * This method retrieves the total number of orders in the system.
+     *
+     * @return the total number of orders.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long getTotalOrdersCount() {
+        return this.orderRepo.count();
+    }
+
+    /**
+     * This method retrieves the total income from all orders in the system.
+     *
+     * @return the total income.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long getTotalIncome() {
+        Double totalIncome = this.orderRepo.getTotalIncome();
+        return totalIncome.longValue();
+    }
+
+    /**
+     * This method retrieves the total income from all orders in the system by month.
+     *
+     * @return the total income by month.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map<String, Double>> getTotalIncomeByMonth() {
+        return this.orderRepo.getTotalIncomeByMonth();
+    }
+
+    /**
+     * This method converts a OrderDto object to an Order object.
      *
      * @param orderDto the OrderDto object to convert
      * @return the converted Order object
@@ -192,7 +227,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * This method maps a Order object to a OrderDto.
+     * This method maps an Order object to a OrderDto.
      *
      * @param order the Order object to map
      * @return the mapped OrderDto object
@@ -204,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * This method maps a OrderDto object to a Order.
+     * This method maps an OrderDto object to an Order.
      *
      * @param orderDto the OrderDto object to map
      * @return the mapped Order object

@@ -5,6 +5,7 @@ import com.vedasole.ekartecommercebackend.payload.OrderDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
 
@@ -16,5 +17,8 @@ public interface OrderService {
     List<OrderDto> getAllOrders();
     Page<OrderDto> getAllOrdersPerPage(int page, int size, String sortBy, String sortOrder);
     Page<OrderDto> getAllOrdersbyCustomerPerPage(long customerId, int page, int size, String sortBy, String sortOrder);
+    Long getTotalOrdersCount();
+    Long getTotalIncome();
+    List<Map<String, Double>> getTotalIncomeByMonth();
     Order convertToOrder(OrderDto orderDto);
 }

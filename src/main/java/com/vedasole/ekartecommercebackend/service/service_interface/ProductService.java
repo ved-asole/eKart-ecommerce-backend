@@ -24,6 +24,8 @@ public interface ProductService {
 
     List<ProductDto> getAllProductsByCategory(long categoryId);
 
+    Long getTotalProductsCount();
+
     Product productDtoToEntity(ProductDto productDto);
 
     ProductDto productEntityToDto(Product product);

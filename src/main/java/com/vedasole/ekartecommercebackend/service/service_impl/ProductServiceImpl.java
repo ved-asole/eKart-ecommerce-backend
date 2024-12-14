@@ -151,6 +151,13 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+    /**
+     * This method returns a list of ProductDtos for all Products in the database, based on the specified search key.
+     * @param page the page number to retrieve
+     * @param size the number of Products to retrieve
+     * @param searchKey the search key to search for
+     * @return a list of ProductDtos for the specified Products
+     */
     @Override
     public List<ProductDto> getProductsByNameOrDesc(int page, int size, String searchKey) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -161,9 +168,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     *
-     * @param categoryId
-     * @return
+     * This method returns a list of ProductDtos for all Products in the database, based on the specified Category ID.
+     * @param categoryId the ID of the Category to retrieve Products for
+     * @return a list of ProductDtos for the specified Category
      */
     @Override
     public List<ProductDto> getAllProductsByCategory(long categoryId) {
@@ -174,15 +181,30 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * 
-     * @param productDto
-     * @return
+     * This method returns the total number of Products in the database.
+     * @return the total number of Products
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long getTotalProductsCount() {
+        return this.productRepo.count();
+    }
+
+    /**
+     * This method maps a ProductDto to a Product object.
+     * @param productDto the ProductDto to map
+     * @return the mapped Product object
      */
     @Override
     public Product productDtoToEntity(ProductDto productDto) {
         return dtoToProduct(productDto);
     }
 
+    /**
+     * This method maps a Product object to a ProductDto.
+     * @param product the Product to map
+     * @return the mapped ProductDto object
+     */
     @Override
     public ProductDto productEntityToDto(Product product) {
         return productToDto(product);

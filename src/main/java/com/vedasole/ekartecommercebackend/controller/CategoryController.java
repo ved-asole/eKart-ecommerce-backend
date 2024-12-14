@@ -129,4 +129,15 @@ public class CategoryController {
                 HttpStatus.OK
         );
     }
+
+        /**
+     * Returns the total number of categories in the database.
+     *
+     * @return the total number of categories in the database
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCategoriesCount() {
+        return ResponseEntity.ok(this.categoryService.getTotalCategoriesCount());
+    }
+
 }

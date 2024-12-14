@@ -228,6 +228,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     /**
+     * Returns the total number of customers.
+     *
+     * @return the total number of customers
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long getTotalCustomersCount() {
+        return this.customerRepo.count();
+    }
+
+    /**
      * Sends a welcome email to a new customer.
      *
      * @param email the email address of the recipient
