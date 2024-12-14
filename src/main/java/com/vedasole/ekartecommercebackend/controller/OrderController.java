@@ -123,6 +123,11 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getTotalOrdersCount());
     }
 
+    @GetMapping("/income")
+    public ResponseEntity<Long> getTotalIncome() {
+        return ResponseEntity.ok(orderService.getTotalIncome());
+    }
+
     @GetMapping("/page")
     public ResponseEntity<Page<EntityModel<OrderDto>>> getAllOrdersPerPage(
             @RequestParam(defaultValue = "0") int page,

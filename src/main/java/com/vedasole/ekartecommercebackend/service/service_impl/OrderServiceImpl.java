@@ -191,7 +191,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * This method converts a OrderDto object to a Order object.
+     * This method retrieves the total income from all orders in the system.
+     *
+     * @return the total income.
+     */
+    @Override
+    public Long getTotalIncome() {
+        Double totalIncome = this.orderRepo.getTotalIncome();
+        log.info("Total income calculated: {}", totalIncome);
+        return totalIncome.longValue();
+    }
+
+    /**
+     * This method converts a OrderDto object to an Order object.
      *
      * @param orderDto the OrderDto object to convert
      * @return the converted Order object
@@ -202,7 +214,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * This method maps a Order object to a OrderDto.
+     * This method maps an Order object to a OrderDto.
      *
      * @param order the Order object to map
      * @return the mapped OrderDto object
@@ -214,7 +226,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * This method maps a OrderDto object to a Order.
+     * This method maps an OrderDto object to an Order.
      *
      * @param orderDto the OrderDto object to map
      * @return the mapped Order object
