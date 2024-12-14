@@ -17,9 +17,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CUSTOMER;
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.ORDER;
@@ -198,8 +199,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Long getTotalIncome() {
         Double totalIncome = this.orderRepo.getTotalIncome();
-        log.info("Total income calculated: {}", totalIncome);
         return totalIncome.longValue();
+    }
+
+    /**
+     * This method retrieves the total income from all orders in the system by month.
+     *
+     * @return the total income by month.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Map<String, Double>> getTotalIncomeByMonth() {
+        return this.orderRepo.getTotalIncomeByMonth();
     }
 
     /**

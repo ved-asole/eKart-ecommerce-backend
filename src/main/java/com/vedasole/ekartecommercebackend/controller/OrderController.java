@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -126,6 +127,11 @@ public class OrderController {
     @GetMapping("/income")
     public ResponseEntity<Long> getTotalIncome() {
         return ResponseEntity.ok(orderService.getTotalIncome());
+    }
+
+    @GetMapping("/income-by-month")
+    public ResponseEntity<List<Map<String, Double>>> getTotalIncomeByMonth() {
+        return ResponseEntity.ok(orderService.getTotalIncomeByMonth());
     }
 
     @GetMapping("/page")
