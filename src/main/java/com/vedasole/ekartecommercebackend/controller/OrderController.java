@@ -118,6 +118,11 @@ public class OrderController {
         return ResponseEntity.ok(orderDtoCollectionModel);
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalOrdersCount() {
+        return ResponseEntity.ok(orderService.getTotalOrdersCount());
+    }
+
     @GetMapping("/page")
     public ResponseEntity<Page<EntityModel<OrderDto>>> getAllOrdersPerPage(
             @RequestParam(defaultValue = "0") int page,

@@ -181,6 +181,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * This method retrieves the total number of orders in the system.
+     *
+     * @return the total number of orders.
+     */
+    @Override
+    public Long getTotalOrdersCount() {
+        return this.orderRepo.count();
+    }
+
+    /**
      * This method converts a OrderDto object to a Order object.
      *
      * @param orderDto the OrderDto object to convert

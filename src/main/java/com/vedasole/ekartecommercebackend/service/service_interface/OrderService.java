@@ -16,5 +16,6 @@ public interface OrderService {
     List<OrderDto> getAllOrders();
     Page<OrderDto> getAllOrdersPerPage(int page, int size, String sortBy, String sortOrder);
     Page<OrderDto> getAllOrdersbyCustomerPerPage(long customerId, int page, int size, String sortBy, String sortOrder);
+    Long getTotalOrdersCount();
     Order convertToOrder(OrderDto orderDto);
 }
