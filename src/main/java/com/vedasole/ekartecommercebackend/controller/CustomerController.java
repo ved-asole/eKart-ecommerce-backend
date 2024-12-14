@@ -156,4 +156,14 @@ public class CustomerController {
         );
     }
 
+    /**
+     * Returns the total number of Customers.
+     *
+     * @return the total number of Customers
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCustomersCount() {
+        return ResponseEntity.ok(this.customerService.getTotalCustomersCount());
+    }
+
 }
