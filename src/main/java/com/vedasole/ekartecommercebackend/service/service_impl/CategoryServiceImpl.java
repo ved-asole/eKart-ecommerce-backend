@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,6 +129,17 @@ public class CategoryServiceImpl implements CategoryService {
                 this.categoryRepo.findById(categoryId)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Category", "id", categoryId)));
+    }
+
+    @Override
+    @Cacheable(
+            value = "allCategoriesPerPage",
+            key = "#page + '-' + #size + '-' + #sortBy + '-' + #sortOrder",
+            sync = true
+    )
+    @Transactional(readOnly = true)
+    public Page<CategoryDto> getAllCategoriesByPage(int page, int size, String sortBy, String sortOrder) {
+        return null;
     }
 
     /**
