@@ -103,7 +103,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "orderId") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder
+            @RequestParam(defaultValue = "desc") String sortOrder
     ) {
         Page<OrderDto> orderDtoPage = orderService.getAllOrdersbyCustomerPerPage(customerId, page, size, sortBy, sortOrder);
         return getEntityModelPage(orderDtoPage);
@@ -139,7 +139,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "orderId") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortOrder
+            @RequestParam(defaultValue = "desc") String sortOrder
     ) {
         Page<OrderDto> orderDtoPage = orderService.getAllOrdersPerPage(page, size, sortBy, sortOrder);
         return getEntityModelPage(orderDtoPage);

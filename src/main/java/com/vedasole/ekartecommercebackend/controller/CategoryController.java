@@ -4,6 +4,7 @@ import com.vedasole.ekartecommercebackend.payload.ApiResponse;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -129,8 +130,28 @@ public class CategoryController {
                 HttpStatus.OK
         );
     }
-
-        /**
+  
+    /**
+     * Returns a paginated list of all categories.
+     *
+     * @param page the page number
+     * @param size the number of items per page
+     * @param sortBy the field to sort by
+     * @param sortOrder the sort order
+     * @return a paginated list of all categories
+     */
+    @GetMapping("/page")
+    public ResponseEntity<Page<CategoryDto>> getAllCategories(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "categoryId") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder
+    ){
+        Page<CategoryDto> allCategoriesByPage = this.categoryService.getAllCategoriesByPage(page, size, sortBy, sortOrder);
+        return new ResponseEntity<>(allCategoriesByPage,HttpStatus.OK);
+    }
+  
+    /**
      * Returns the total number of categories in the database.
      *
      * @return the total number of categories in the database

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,7 +26,8 @@ import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.P
 
 
 /**
- * This class implements the ProductService interface. It uses the ProductRepo and MapperConfig objects to perform operations on the database.
+ * This class implements the ProductService interface. It uses the ProductRepo, CategoryRepo
+ * and ModelMapper objects to perform operations on the product entities.
  */
 @Service
 @AllArgsConstructor
@@ -42,6 +44,11 @@ public class ProductServiceImpl implements ProductService {
      * @return a ProductDto with the information for the new Product
      */
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "allProducts", allEntries = true),
+            @CacheEvict(value = "allProductsPage", allEntries = true),
+            @CacheEvict(value = "allProductsPerCategoryPage", allEntries = true)
+    })
     public ProductDto createProduct(ProductDto productDto) {
 
         Product product = dtoToProduct(productDto);
@@ -71,6 +78,12 @@ public class ProductServiceImpl implements ProductService {
      * @return a ProductDto with the updated information for the Product
      */
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "product", key = "#productId"),
+            @CacheEvict(value = "allProducts", allEntries = true),
+            @CacheEvict(value = "allProductsPage", allEntries = true),
+            @CacheEvict(value = "allProductsPerCategoryPage", allEntries = true)
+    })
     @CacheEvict(value = "product", key = "#productId")
     public ProductDto updateProduct(ProductDto productDto, Long productId) {
         Product product = dtoToProduct(productDto);
@@ -103,7 +116,12 @@ public class ProductServiceImpl implements ProductService {
      * @param productId the ID of the Product to delete
      */
     @Override
-    @CacheEvict(value = "product", key = "#productId")
+    @Caching(evict = {
+            @CacheEvict(value = "product", key = "#productId"),
+            @CacheEvict(value = "allProducts", allEntries = true),
+            @CacheEvict(value = "allProductsPage", allEntries = true),
+            @CacheEvict(value = "allProductsPerCategoryPage", allEntries = true)
+    })
     public void deleteProduct(Long productId) throws IllegalArgumentException {
         this.productRepo.deleteById(productId);
     }
@@ -113,6 +131,7 @@ public class ProductServiceImpl implements ProductService {
      * @return a list of all ProductDtos
      */
     @Override
+    @Cacheable(value = "allProducts", sync = true)
     public List<ProductDto> getAllProducts() {
         return this.productRepo.findAll(Sort.by("productId")).stream()
                 .map(this::productToDto)
@@ -129,6 +148,12 @@ public class ProductServiceImpl implements ProductService {
      * @return a list of ProductDtos for the specified Products
      */
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "allProductsPage",
+            key = "#page + '-' + #size + '-' + #sortBy + '-' + #sortOrder",
+            sync = true
+    )
     public Page<ProductDto> getAllProductsPerPage(int page, int size, String sortBy, String sortOrder) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortBy));
         Page<Product> productsPage = productRepo.findAll(pageRequest);
@@ -141,6 +166,7 @@ public class ProductServiceImpl implements ProductService {
      * @return a ProductDto for the specified Product
      */
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "product", key = "#productId")
     public ProductDto getProductById(Long productId) {
         return productToDto(
@@ -152,11 +178,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * This method returns a list of ProductDtos for all Products in the database, based on the specified search key.
+     * This method returns a list of ProductDtos for Products that match the specified search key in their name or description.
      * @param page the page number to retrieve
      * @param size the number of Products to retrieve
-     * @param searchKey the search key to search for
-     * @return a list of ProductDtos for the specified Products
+     * @param searchKey the search key to match against Product names and descriptions
+     * @return a list of ProductDtos for the matching Products
      */
     @Override
     public List<ProductDto> getProductsByNameOrDesc(int page, int size, String searchKey) {
@@ -168,9 +194,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * This method returns a list of ProductDtos for all Products in the database, based on the specified Category ID.
-     * @param categoryId the ID of the Category to retrieve Products for
-     * @return a list of ProductDtos for the specified Category
+     * This method returns a list of ProductDtos for all Products in the specified category.
+     * @param categoryId the ID of the category to retrieve Products for
+     * @return a list of ProductDtos for the specified category
      */
     @Override
     public List<ProductDto> getAllProductsByCategory(long categoryId) {
@@ -178,6 +204,28 @@ public class ProductServiceImpl implements ProductService {
                 .stream()
                 .map(this::productToDto)
                 .toList();
+    }
+
+    /**
+     * This method returns a list of ProductDtos for all Products in the specified category, based on the specified page, size, sort order, and sort by parameters.
+     * @param categoryId the ID of the category to retrieve Products for
+     * @param page the page number to retrieve
+     * @param size the number of Products to retrieve
+     * @param sortBy the field to sort by
+     * @param sortOrder the order to sort by
+     * @return a list of ProductDtos for the specified Products
+     */
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "allProductsPerCategoryPage",
+            key = "#page + '-' + #size + '-' + #sortBy + '-' + #sortOrder",
+            sync = true
+    )
+    public Page<ProductDto> getAllProductsByCategoryPerPage(long categoryId, int page, int size, String sortBy, String sortOrder) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortBy));
+        Page<Product> productsPage = productRepo.findByCategoryCategoryId(categoryId, pageRequest);
+        return productsPage.map(this::productToDto);
     }
 
     /**
