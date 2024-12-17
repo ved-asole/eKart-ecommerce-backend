@@ -17,6 +17,7 @@ public interface CustomerService {
     CustomerDto getCustomerByEmail(String email);
     void deleteCustomer(Long customerId);
     User getUserForCustomer(Long customerId);
+    Long getTotalCustomersCount();
     Customer convertToCustomer(CustomerDto customerDto);
     CustomerDto convertToCustomerDto(Customer customer);
 

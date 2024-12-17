@@ -229,6 +229,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
+     * This method returns the total number of Products in the database.
+     * @return the total number of Products
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Long getTotalProductsCount() {
+        return this.productRepo.count();
+    }
+
+    /**
      * This method maps a ProductDto to a Product object.
      * @param productDto the ProductDto to map
      * @return the mapped Product object

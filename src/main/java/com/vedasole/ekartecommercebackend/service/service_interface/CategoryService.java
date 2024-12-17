@@ -20,8 +20,9 @@ public interface CategoryService {
 
     void deleteCategory(Long categoryId);
 
+    Long getTotalCategoriesCount();
+
     CategoryDto convertToDto(Category category);
 
     Category convertToEntity(CategoryDto categoryDto);
-
 }

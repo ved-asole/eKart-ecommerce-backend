@@ -186,7 +186,7 @@ public class ProductController {
                 HttpStatus.OK
         );
     }
-
+  
     @GetMapping("/category/{categoryId}/page")
     public ResponseEntity<Page<ProductDto>> getAllProductsByCategoryByPage(
             @PathVariable long categoryId,
@@ -202,6 +202,16 @@ public class ProductController {
                 allProducts,
                 HttpStatus.OK
         );
+    }
+  
+    /**
+     * Returns the total number of products in the system.
+     *
+     * @return the total number of products
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalProductsCount() {
+        return ResponseEntity.ok(this.productService.getTotalProductsCount());
     }
 
 }

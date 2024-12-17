@@ -26,6 +26,8 @@ public interface ProductService {
 
     Page<ProductDto> getAllProductsByCategoryPerPage(long categoryId, int page, int size, String sortBy, String sortOrder);
 
+    Long getTotalProductsCount();
+
     Product productDtoToEntity(ProductDto productDto);
 
     ProductDto productEntityToDto(Product product);

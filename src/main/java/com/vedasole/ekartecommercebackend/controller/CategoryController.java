@@ -130,7 +130,7 @@ public class CategoryController {
                 HttpStatus.OK
         );
     }
-
+  
     /**
      * Returns a paginated list of all categories.
      *
@@ -149,6 +149,16 @@ public class CategoryController {
     ){
         Page<CategoryDto> allCategoriesByPage = this.categoryService.getAllCategoriesByPage(page, size, sortBy, sortOrder);
         return new ResponseEntity<>(allCategoriesByPage,HttpStatus.OK);
+    }
+  
+    /**
+     * Returns the total number of categories in the database.
+     *
+     * @return the total number of categories in the database
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCategoriesCount() {
+        return ResponseEntity.ok(this.categoryService.getTotalCategoriesCount());
     }
 
 }

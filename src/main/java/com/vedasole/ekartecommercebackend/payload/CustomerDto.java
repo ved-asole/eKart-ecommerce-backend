@@ -1,6 +1,7 @@
 package com.vedasole.ekartecommercebackend.payload;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.vedasole.ekartecommercebackend.entity.Customer;
 import com.vedasole.ekartecommercebackend.utility.AppConstant.Role;
 import lombok.AllArgsConstructor;
@@ -65,7 +66,7 @@ public class CustomerDto implements Serializable {
 
     @NotNull(message = "Phone number is required")
     @Pattern(
-            regexp = "^(\\+\\d{1,3}[- ]?)?\\d{10}$",
+            regexp = "^(\\+?\\d{0,3}?[- ]?)\\d{10}$",
             message = "Phone number must be a valid 10-digit number"
     )
     private String phoneNumber;

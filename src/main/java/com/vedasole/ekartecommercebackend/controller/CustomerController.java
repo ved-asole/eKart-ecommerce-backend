@@ -167,5 +167,15 @@ public class CustomerController {
         Page<CustomerDto> allCustomersByPage = this.customerService.getAllCustomersByPage(page, size, sortBy, sortOrder);
         return new ResponseEntity<>(allCustomersByPage,HttpStatus.OK);
     }
+  
+    /**
+     * Returns the total number of Customers.
+     *
+     * @return the total number of Customers
+     */
+    @GetMapping("/count")
+    public ResponseEntity<Long> getTotalCustomersCount() {
+        return ResponseEntity.ok(this.customerService.getTotalCustomersCount());
+    }
 
 }
