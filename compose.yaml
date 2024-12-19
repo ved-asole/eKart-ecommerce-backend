@@ -1,0 +1,63 @@
+version: '3.0.0'
+services:
+  app:
+    container_name: ekart-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+       - "8000:8000"
+    environment:
+      - dbUrl=jdbc:postgresql://db:5432/ekartdb
+      - dbUsername=postgres
+      - dbPassword=postgres
+      - jsonSecretKey=${jsonSecretKey}
+      - adminPassword=${adminPassword}
+      - frontendDomainUrl=${frontendDomainUrl}
+      - stripeApiKey=${stripeApiKey}
+      - REDIS_HOST=redis
+      - endpointSecret=${endpointSecret}
+      - emailUsername=${emailUsername}
+      - emailPassword=${emailPassword}
+
+    # The commented out section below is an example of how to define a PostgreSQL
+    # database that your application can use. `depends_on` tells Docker Compose to
+    # start the database before your application. The `db-data` volume persists the
+    # database data between container restarts.
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  db:
+    container_name: ekart-db
+    image: postgres:17.0-alpine
+    restart: always
+    user: postgres
+    volumes:
+       - db-data:/var/lib/postgresql/data
+    environment:
+       - POSTGRES_DB=ekartdb
+       - POSTGRES_USER=postgres
+       - POSTGRES_PASSWORD=postgres
+    ports:
+       - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:
