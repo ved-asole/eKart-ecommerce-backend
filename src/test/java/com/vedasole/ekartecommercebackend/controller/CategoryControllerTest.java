@@ -5,6 +5,7 @@ import com.vedasole.ekartecommercebackend.config.TestMailConfig;
 import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
+import com.vedasole.ekartecommercebackend.utility.TestApplicationInitializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,9 +44,12 @@ class CategoryControllerTest {
     private CategoryService categoryService;
     @Autowired
     private MockMvc mockMvc;
-    private Category expected;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private TestApplicationInitializer testApplicationInitializer;
+
+    private Category expected;
 
     @BeforeEach
     void setUp() {
@@ -76,6 +80,7 @@ class CategoryControllerTest {
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(baseUrl)
                         .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization","Bearer ".concat(testApplicationInitializer.getAdminToken()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(convertToCategoryDto(expected)))
                 )
@@ -103,6 +108,7 @@ class CategoryControllerTest {
         ResultActions resultActions = mockMvc.perform(
                         put(baseUrl.concat("/").concat(String.valueOf(expected.getCategoryId())))
                                 .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization","Bearer ".concat(testApplicationInitializer.getAdminToken()))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(convertToCategoryDto(expected)))
                 )
@@ -121,6 +127,7 @@ class CategoryControllerTest {
         mockMvc.perform(
                         MockMvcRequestBuilders.delete(baseUrl.concat("/").concat(String.valueOf(expected.getCategoryId())))
                                 .accept(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer ".concat(testApplicationInitializer.getAdminToken()))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 // then

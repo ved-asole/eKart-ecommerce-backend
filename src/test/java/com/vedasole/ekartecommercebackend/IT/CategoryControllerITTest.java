@@ -4,6 +4,7 @@ import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
+import com.vedasole.ekartecommercebackend.utility.TestApplicationInitializer;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,14 +30,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CategoryControllerITTest {
 
-    private static RestTemplate restTemplate;
-    @LocalServerPort
-    private int port;
-    private String baseUrl="http://localhost";
     @Autowired
     private CategoryRepo categoryRepo;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private TestApplicationInitializer testApplicationInitializer;
+
+    @LocalServerPort
+    private int port;
+    private static RestTemplate restTemplate;
+    private String baseUrl="http://localhost";
     private Category expected;
 
     @BeforeAll
@@ -52,6 +56,12 @@ class CategoryControllerITTest {
      */
     @BeforeEach
     void setUp() {
+
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().add("Authorization", "Bearer " + testApplicationInitializer.getAdminToken());
+            return execution.execute(request, body);
+        });
+
         baseUrl = baseUrl.concat(":").concat(String.valueOf(port)).concat("/api/v1/categories");
 
         Category category = new Category(
@@ -140,7 +150,9 @@ class CategoryControllerITTest {
         List<Category> categories = categoryRepo.findAll();
         if(!categories.isEmpty()) {
             Category category = categories.get(0);
-            restTemplate.delete(baseUrl.concat("/").concat(String.valueOf(category.getCategoryId())));
+            restTemplate.delete(
+                    baseUrl.concat("/").concat(String.valueOf(category.getCategoryId()))
+            );
             categoryRepo.findById(category.getCategoryId()).ifPresentOrElse(
                     c -> Assertions.fail("Category not deleted"),
                     () -> assertTrue(true)
