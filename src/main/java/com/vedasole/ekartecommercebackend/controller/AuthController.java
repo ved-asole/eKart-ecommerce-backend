@@ -1,9 +1,6 @@
 package com.vedasole.ekartecommercebackend.controller;
 
-import com.vedasole.ekartecommercebackend.payload.ApiResponse;
-import com.vedasole.ekartecommercebackend.payload.AuthenticationRequest;
-import com.vedasole.ekartecommercebackend.payload.AuthenticationResponse;
-import com.vedasole.ekartecommercebackend.payload.PasswordResetRequestDto;
+import com.vedasole.ekartecommercebackend.payload.*;
 import com.vedasole.ekartecommercebackend.service.service_interface.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -71,13 +68,13 @@ public class AuthController {
         else return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
     }
 
-    @PostMapping("/forgot-password")
-    public ResponseEntity<ApiResponse> generatePasswordResetToken(@RequestParam String email) {
+    @PostMapping("/generate-reset-token")
+    public ResponseEntity<ApiResponse> generatePasswordResetToken(@RequestBody ResetTokenRequestDto resetTokenRequestDto) {
         try {
-            authenticationService.generatePasswordResetToken(email.replace("%40","@"));
-            return new ResponseEntity<>(new ApiResponse("Password reset email sent successfully", true), HttpStatus.OK);
+            authenticationService.generatePasswordResetToken(resetTokenRequestDto.email());
+            return new ResponseEntity<>(new ApiResponse("Password reset token sent successfully", true), HttpStatus.OK);
         } catch (MessagingException e) {
-            return new ResponseEntity<>(new ApiResponse("Cannot send email to the emailId: " + email, false), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ApiResponse("Cannot send token to the emailId: " + resetTokenRequestDto.email(), false), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -95,9 +92,9 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/validate-reset-token")
-    public ResponseEntity<Boolean> isResetTokenValid(@RequestParam String token) {
-        boolean isTokenValid = authenticationService.isResetTokenValid(token);
+    @PostMapping("/validate-reset-token")
+    public ResponseEntity<Boolean> isResetTokenValid(@RequestBody ValidateTokenRequestDto validateTokenRequestDto) {
+        boolean isTokenValid = authenticationService.isResetTokenValid(validateTokenRequestDto.token());
         if(isTokenValid) return new ResponseEntity<>(true, HttpStatus.OK);
         else return new ResponseEntity<>(false, HttpStatus.BAD_GATEWAY);
     }
