@@ -66,10 +66,6 @@ public class Customer {
     @JoinColumn(name = "user_id", unique = true, nullable = false, updatable = false)
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
-    private Address address;
-
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
     private ShoppingCart shoppingCart;
 

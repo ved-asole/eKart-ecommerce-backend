@@ -149,9 +149,6 @@ public class CustomerServiceImpl implements CustomerService {
         customerFromDB.setFirstName(customer.getFirstName());
         customerFromDB.setLastName(customer.getLastName());
         customerFromDB.setPhoneNumber(customer.getPhoneNumber());
-        //TODO : Add Address functionality
-        customerFromDB.setAddress(customer.getAddress());
-
 
         Customer updatedCustomer = this.customerRepo.save(customerFromDB);
 
