@@ -16,6 +16,7 @@ env:
   frontendDomainUrl: 'http://localhost:5173'
   ekartBackendPassword: 'fakeEkartBackendPassword'
   stripeApiKey: 'fake-stripe-api-key'
+  stripeEndpointSecret: 'fake-stripe-endpoint-secret'
   adminPassword: 'fakeAdminPassword'
 
 jobs:
