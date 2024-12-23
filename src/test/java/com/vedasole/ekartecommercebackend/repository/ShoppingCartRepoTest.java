@@ -1,6 +1,5 @@
 package com.vedasole.ekartecommercebackend.repository;
 
-import com.vedasole.ekartecommercebackend.entity.Address;
 import com.vedasole.ekartecommercebackend.entity.Customer;
 import com.vedasole.ekartecommercebackend.entity.ShoppingCart;
 import com.vedasole.ekartecommercebackend.entity.User;
@@ -40,14 +39,6 @@ class ShoppingCartRepoTest {
                 "1234567890",
                 "john@email.com",
                 new User("john@email.com", "password", AppConstant.Role.USER),
-                new Address(
-                        "123",
-                        "Main St",
-                        "New York",
-                        "NY",
-                        "USA",
-                        10001
-                ),
                 null,
                 LocalDateTime.now(),
                 LocalDateTime.now()
