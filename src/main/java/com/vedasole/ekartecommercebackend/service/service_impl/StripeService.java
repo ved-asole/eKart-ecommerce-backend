@@ -51,6 +51,8 @@ public class StripeService {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setCustomerCreation(SessionCreateParams.CustomerCreation.IF_REQUIRED)
+                .setShippingAddressCollection(SessionCreateParams.ShippingAddressCollection.builder()
+                        .addAllowedCountry(SessionCreateParams.ShippingAddressCollection.AllowedCountry.IN).build())
                 .setClientReferenceId(clientReferenceNumber)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setCustomerEmail(shoppingCart.getCustomer().getEmail())
@@ -73,16 +75,13 @@ public class StripeService {
 
     private Order createOrder(ShoppingCart shoppingCart) {
 
-//              TODO : Setup Address for Order from UI
-//                shoppingCart.getCustomer().getAddress()
-        Address address = addressRepo.save(new Address(
-                5,
-                "Address Line 1",
-                "Address Line 2",
-                "City",
-                "State",
-                "Country",
-                444101
+        Address dummyAddress = addressRepo.save(new Address(
+                "Dummy Address Line 1",
+                "Dummy Address Line 2",
+                "Dummy City",
+                "Dummy State",
+                "Dummy Country",
+                100001
         ));
 
         double totalAmount = shoppingCart.getTotal() - shoppingCart.getDiscount();
@@ -93,9 +92,7 @@ public class StripeService {
                 101L,
                 shoppingCart.getCustomer(),
                 new ArrayList<>(),
-//              TODO : Setup Address for Order from UI
-//                shoppingCart.getCustomer().getAddress()
-                address,
+                dummyAddress,
                 totalAmount,
                 ORDER_CREATED
         );
@@ -121,7 +118,8 @@ public class StripeService {
                                 .setPriceData(generatePriceData(item))
                                 .build();
                     else return null;
-                }).toList();
+                })
+                .toList();
     }
 
     private SessionCreateParams.LineItem.PriceData generatePriceData(ShoppingCartItem item) {

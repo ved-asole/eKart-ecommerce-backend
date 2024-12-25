@@ -4,11 +4,13 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
+import com.vedasole.ekartecommercebackend.entity.Address;
 import com.vedasole.ekartecommercebackend.entity.ShoppingCart;
 import com.vedasole.ekartecommercebackend.exception.APIException;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
 import com.vedasole.ekartecommercebackend.payload.ShoppingCartDto;
+import com.vedasole.ekartecommercebackend.repository.AddressRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.*;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
@@ -32,6 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final ShoppingCartItemService shoppingCartItemService;
     private final OrderRepo orderRepo;
     private final CustomerService customerService;
+    private final AddressRepo addressRepo;
     private final EmailService emailService;
     private static final String ORDER_ID_STRING = "order_id";
     private static final String CUSTOMERID_STRING = "customerId";
@@ -100,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
         if ( metadata.get(ORDER_ID_STRING) != null && Long.parseLong(metadata.get(ORDER_ID_STRING)) > 0
                 && metadata.get(CUSTOMER_ID_STRING) != null && Long.parseLong(metadata.get(CUSTOMER_ID_STRING)) > 0
         ) {
-            if(session.getStatus().equals("complete")) handleCompletedCheckoutSession(metadata);
+            if(session.getStatus().equals("complete")) handleCompletedCheckoutSession(metadata, session.getCustomerDetails().getAddress());
             else if(session.getStatus().equals("expired")) handleExpiredCheckoutSession(metadata);
         }
         else throw new APIException(INVALID_WEBHOOK_MSG, HttpStatus.BAD_REQUEST);
@@ -137,18 +140,16 @@ public class PaymentServiceImpl implements PaymentService {
      * This method handles the completed checkout session event.
      *
      * @param metadata The metadata of the completed checkout session.
+     * @param stripeAddress The stripeAddress object received from Stripe.
      * @throws APIException If an error occurs while handling the completed checkout session.
      */
-    private void handleCompletedCheckoutSession(Map<String, String> metadata) {
+    private void handleCompletedCheckoutSession(Map<String, String> metadata, com.stripe.model.Address stripeAddress) {
         long orderId = Long.parseLong(metadata.get(ORDER_ID_STRING));
         long customerId = Long.parseLong(metadata.get(CUSTOMER_ID_STRING));
         orderRepo.findById(orderId)
                 .ifPresentOrElse(
                         order -> {
                             if (order.getCustomer().getCustomerId() == customerId) {
-                                // Update Order status
-                                order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
-                                orderRepo.save(order);
                                 // Clear the user cart
                                 CustomerDto customer = customerService.getCustomerById(customerId);
                                 customerService.updateCustomer(customer, customerId);
@@ -157,6 +158,21 @@ public class PaymentServiceImpl implements PaymentService {
 
                                 // Format order total
                                 order.setTotal(Math.round(order.getTotal()));
+
+                                // Set stripeAddress
+                                Address address = new Address(
+                                        order.getAddress().getAddressId(),
+                                        stripeAddress.getLine1(),
+                                        stripeAddress.getLine2(),
+                                        stripeAddress.getCity(),
+                                        stripeAddress.getState(),
+                                        stripeAddress.getCountry(),
+                                        Integer.parseInt(stripeAddress.getPostalCode())
+                                );
+                                Address savedAddress = addressRepo.save(address);
+                                order.setAddress(savedAddress);
+                                order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
+                                order = orderRepo.save(order);
 
                                 Context context = new Context();
                                 context.setVariable("order", order);
@@ -179,8 +195,6 @@ public class PaymentServiceImpl implements PaymentService {
                                 log.error("Order {} is not for customerId : {}", orderId, customerId);
                                 throw new ResourceNotFoundException(ORDER_STRING, CUSTOMERID_STRING, customerId);
                             }
-                            order.setOrderStatus(AppConstant.OrderStatus.ORDER_PLACED);
-                            orderRepo.save(order);
                         },
                         () -> {
                             log.error("Order not found in complete checkout session event with id : {}", orderId);
