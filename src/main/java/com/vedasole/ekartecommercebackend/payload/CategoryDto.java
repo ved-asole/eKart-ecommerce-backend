@@ -34,9 +34,7 @@ public class CategoryDto implements Serializable {
     @NotBlank(message = "Category name cannot be blank")
     @Size(min = 3, max = 50, message = "Category name must be between 3 and 50 characters")
     private String name;
-    
-    @NotNull(message = "Category image is required")
-    @NotBlank(message = "Category image cannot be blank")
+
     private String image;
     
     @NotNull(message = "Category is required")
@@ -53,5 +51,13 @@ public class CategoryDto implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss:mm")
     private LocalDateTime updatedAt;
+
+    public CategoryDto(String name, String image, String desc, Category parentCategory, boolean active) {
+        this.name = name;
+        this.image = image;
+        this.desc = desc;
+        this.parentCategory = parentCategory;
+        this.active = active;
+    }
 
 }

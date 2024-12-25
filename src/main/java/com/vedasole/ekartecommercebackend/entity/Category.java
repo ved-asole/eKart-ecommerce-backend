@@ -43,9 +43,7 @@ public class Category implements Serializable {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @NotNull
-    @NotBlank
-    @Column(name = "image", nullable = false)
+    @Column(name = "image")
     private String image;
 
     @Column(name = "desc", length = 1000)
