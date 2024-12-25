@@ -60,13 +60,14 @@ public class ProductServiceImpl implements ProductService {
                 )
         );
         // Added temp sku due to not null and not blank annotations for sku in Product
-        product.setSku("temp-sku");
+        product.setSku(product.getCategory().getName().substring(0, 3)
+                .concat("-")
+                .concat(product.getName().substring(0, 5).replace(" ", "X"))
+                .concat("-")
+                .concat(product.getDesc().substring(0, 3).replace(" ", "X"))
+        );
 
         Product addedProduct = this.productRepo.save(product);
-
-        addedProduct.setSku(product.getCategory().getName().substring(0, 3).concat("-").concat(Long.toString(product.getProductId())));
-
-        addedProduct = this.productRepo.save(addedProduct);
 
         return productToDto(addedProduct);
     }
@@ -84,7 +85,6 @@ public class ProductServiceImpl implements ProductService {
             @CacheEvict(value = "allProductsPage", allEntries = true),
             @CacheEvict(value = "allProductsPerCategoryPage", allEntries = true)
     })
-    @CacheEvict(value = "product", key = "#productId")
     public ProductDto updateProduct(ProductDto productDto, Long productId) {
         Product product = dtoToProduct(productDto);
         Product productInDB = this.productRepo.findById(productId).

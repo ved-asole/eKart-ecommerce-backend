@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -70,4 +71,13 @@ public final class ProductDto implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss:mm")
     private LocalDateTime updatedAt;
 
+    public ProductDto(String name, String image, String desc, double price, double discount, int qtyInStock, long categoryId) {
+        this.name = name;
+        this.image = image;
+        this.desc = desc;
+        this.price = price;
+        this.discount = discount;
+        this.qtyInStock = qtyInStock;
+        this.categoryId = categoryId;
+    }
 }
