@@ -12,6 +12,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,13 @@ public class CategoryServiceImpl implements CategoryService {
      * @return the CategoryDTO representation of the newly created Category record
      */
     @Override
-    @CacheEvict(value = "allCategories", allEntries = true)
+    @Caching(evict = {
+                    @CacheEvict(value = "allCategories", allEntries = true),
+                    @CacheEvict(value = "allCategoriesByPage", allEntries = true),
+                    @CacheEvict(value = "allParentCategories", allEntries = true),
+                    @CacheEvict(value = "allParentCategoriesByPage", allEntries = true),
+                    @CacheEvict(value = "totalCategoriesCount", allEntries = true)
+    })
     public CategoryDto createCategory(CategoryDto categoryDto) {
         Category category = dtoToCategory(categoryDto);
         if(category.getParentCategory() !=  null) {
@@ -58,8 +66,12 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "category", key = "#categoryId"), // Invalidate specific category cache
-            @CacheEvict(value = "allCategories", allEntries = true) // Invalidate all categories cache
+            @CacheEvict(value = "category", key = "#categoryId"),
+            @CacheEvict(value = "allCategories", allEntries = true),
+            @CacheEvict(value = "allCategoriesByPage", allEntries = true),
+            @CacheEvict(value = "allParentCategories", allEntries = true),
+            @CacheEvict(value = "allParentCategoriesByPage", allEntries = true),
+            @CacheEvict(value = "totalCategoriesCount", allEntries = true)
     })
     public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
         Category category = dtoToCategory(categoryDto);
@@ -93,8 +105,12 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "category", key = "#categoryId"), // Invalidate specific category cache
-            @CacheEvict(value = "allCategories", allEntries = true) // Invalidate all categories cache
+            @CacheEvict(value = "category", key = "#categoryId"),
+            @CacheEvict(value = "allCategories", allEntries = true),
+            @CacheEvict(value = "allCategoriesByPage", allEntries = true),
+            @CacheEvict(value = "allParentCategories", allEntries = true),
+            @CacheEvict(value = "allParentCategoriesByPage", allEntries = true),
+            @CacheEvict(value = "totalCategoriesCount", allEntries = true)
     })
     public void deleteCategory(Long categoryId) {
         this.categoryRepo.deleteById(categoryId);
@@ -107,22 +123,9 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "totalCategoriesCount", sync = true)
     public Long getTotalCategoriesCount() {
         return this.categoryRepo.count();
-    }
-
-    /**
-     * Returns a list of all categories in the database as CategoryDTOs.
-     *
-     * @return a list of all categories in the database as CategoryDTOs
-     */
-    @Override
-    @Transactional(readOnly = true)
-    @Cacheable(value = "allCategories", sync = true)
-    public List<CategoryDto> getAllCategories() {
-        return this.categoryRepo.findAll().stream()
-                .map(this::categoryToDto)
-                .toList();
     }
 
     /**
@@ -142,15 +145,62 @@ public class CategoryServiceImpl implements CategoryService {
                                 "Category", "id", categoryId)));
     }
 
+    /**
+     * Returns a list of all categories in the database as CategoryDTOs.
+     *
+     * @return a list of all categories in the database as CategoryDTOs
+     */
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "allCategories", sync = true)
+    public List<CategoryDto> getAllCategories() {
+        return this.categoryRepo.findAll().stream()
+                .map(this::categoryToDto)
+                .toList();
+    }
+
+    /**
+     * Returns a list of all parent categories in the database as CategoryDTOs.
+     *
+     * @return a list of all parent categories in the database as CategoryDTOs
+     */
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "allParentCategories", sync = true)
+    public List<CategoryDto> getAllParentCategories() {
+        return this.categoryRepo.findAllByParentCategoryIsNull().stream()
+                .map(this::categoryToDto)
+                .toList();
+    }
+
+    /**
+     * Returns a page of parent categories in the database as CategoryDTOs.
+     *
+     * @return a page of parent categories in the database as CategoryDTOs
+     */
+    @Override
+    @Transactional(readOnly = true)
     @Cacheable(
-            value = "allCategoriesPerPage",
+            value = "allParentCategoriesByPage",
             key = "#page + '-' + #size + '-' + #sortBy + '-' + #sortOrder",
             sync = true
     )
+    public Page<CategoryDto>getAllParentCategoriesByPage(int page, int size, String sortBy, String sortOrder) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortBy));
+        return this.categoryRepo.findAllByParentCategoryIsNull(pageRequest)
+                .map(this::categoryToDto);
+    }
+
+    @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "allCategoriesByPage",
+            key = "#page + '-' + #size + '-' + #sortBy + '-' + #sortOrder",
+            sync = true
+    )
     public Page<CategoryDto> getAllCategoriesByPage(int page, int size, String sortBy, String sortOrder) {
-        return null;
+        return this.categoryRepo.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortBy)))
+                .map(this::categoryToDto);
     }
 
     /**

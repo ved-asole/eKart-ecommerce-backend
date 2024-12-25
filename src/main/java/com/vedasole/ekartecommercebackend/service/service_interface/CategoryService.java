@@ -12,6 +12,10 @@ public interface CategoryService {
 
     CategoryDto updateCategory(CategoryDto categoryDto , Long categoryId);
 
+    List<CategoryDto> getAllParentCategories();
+
+    Page<CategoryDto> getAllParentCategoriesByPage(int page, int size, String sortBy, String sortOrder);
+
     List<CategoryDto> getAllCategories();
 
     CategoryDto getCategoryById(Long categoryId);
@@ -25,4 +29,5 @@ public interface CategoryService {
     CategoryDto convertToDto(Category category);
 
     Category convertToEntity(CategoryDto categoryDto);
+
 }

@@ -114,6 +114,39 @@ public class CategoryController {
         }
     }
 
+    /**
+     * Returns a list of all parent categories.
+     *
+     * @return a list of all parent categories
+     */
+    @GetMapping("/parent")
+    public ResponseEntity<CollectionModel<CategoryDto>> getAllParentCategories(){
+        List<CategoryDto> allParentCategories = this.categoryService.getAllParentCategories();
+        return new ResponseEntity<>(
+                CollectionModel.of(
+                        allParentCategories,
+                        linkTo(methodOn(CategoryController.class).getAllParentCategories()).withSelfRel()
+                ),
+                HttpStatus.OK
+        );
+    }
+
+    /**
+     * Returns a page of all parent categories.
+     *
+     * @return a page of all parent categories
+     */
+    @GetMapping("/parent/page")
+    public ResponseEntity<Page<CategoryDto>> getAllParentCategoriesByPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "categoryId") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder
+    ){
+        Page<CategoryDto> allParentCategoriesByPage = this.categoryService.getAllParentCategoriesByPage(page, size, sortBy, sortOrder);
+        return new ResponseEntity<>(allParentCategoriesByPage,HttpStatus.OK);
+    }
+
         /**
      * Returns a list of all categories.
      *
