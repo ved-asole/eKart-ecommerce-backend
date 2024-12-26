@@ -140,14 +140,13 @@ public class CustomerServiceImpl implements CustomerService {
                         USER.getValue(), "id", userId));
 
         userForCustomerInDB.setEmail(customerDto.getEmail());
-        Optional.ofNullable(customerDto.getPassword()).ifPresent(
-                password -> userForCustomerInDB.setPassword(passwordEncoder.encode(password))
-        );
-        userForCustomerInDB.setRole(customerDto.getRole());
+        Optional.ofNullable(customerDto.getRole())
+                .ifPresent(userForCustomerInDB::setRole);
 
         User updatedUser = this.userRepo.save(userForCustomerInDB);
 
         customerFromDB.setUser(updatedUser);
+        customerFromDB.setEmail(customerDto.getEmail());
         customerFromDB.setFirstName(customer.getFirstName());
         customerFromDB.setLastName(customer.getLastName());
         customerFromDB.setPhoneNumber(customer.getPhoneNumber());

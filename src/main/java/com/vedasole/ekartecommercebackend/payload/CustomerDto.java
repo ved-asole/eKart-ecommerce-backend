@@ -55,13 +55,6 @@ public class CustomerDto implements Serializable {
     )
     private String email;
 
-    @NotBlank(message = "Password cannot be blank")
-    @Size(
-            min = 3,
-            max = 20,
-            message = "Password must be between minimum of 3 characters " +
-                    "and maximum of 20 characters"
-    )
     private String password;
 
     @NotNull(message = "Phone number is required")
@@ -71,11 +64,8 @@ public class CustomerDto implements Serializable {
     )
     private String phoneNumber;
 
-    @NotNull(message = "Role is required")
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    private AddressDto address;
 
     @JsonIncludeProperties({"cartId"})
     private ShoppingCartDto shoppingCart;
