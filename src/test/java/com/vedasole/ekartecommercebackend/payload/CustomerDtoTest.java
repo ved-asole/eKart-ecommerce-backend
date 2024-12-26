@@ -134,7 +134,7 @@ void shouldValidateEmailFormatWhenNotValid() {
 @Test
 void shouldValidatePasswordLengthWhenLessThanMinimum() {
     // Given
-    CustomerDto customerDto = CustomerDto.builder()
+    NewCustomerDto newCustomerDto = NewCustomerDto.builder()
             .customerId(1)
             .firstName("John")
             .lastName("Doe")
@@ -145,7 +145,7 @@ void shouldValidatePasswordLengthWhenLessThanMinimum() {
             .build();
 
     // When
-    Set<ConstraintViolation<CustomerDto>> violations = validator.validate(customerDto);
+    Set<ConstraintViolation<NewCustomerDto>> violations = validator.validate(newCustomerDto);
 
     // Then
     assertEquals(1, violations.size());
@@ -156,7 +156,7 @@ void shouldValidatePasswordLengthWhenLessThanMinimum() {
 @Test
 void shouldValidatePasswordLengthWhenMoreThanMaximum() {
     // Given
-    CustomerDto customerDto = CustomerDto.builder()
+    NewCustomerDto newCustomerDto = NewCustomerDto.builder()
             .customerId(1)
             .firstName("John")
             .lastName("Doe")
@@ -167,7 +167,7 @@ void shouldValidatePasswordLengthWhenMoreThanMaximum() {
             .build();
 
     // When
-    Set<ConstraintViolation<CustomerDto>> violations = validator.validate(customerDto);
+    Set<ConstraintViolation<NewCustomerDto>> violations = validator.validate(newCustomerDto);
 
     // Then
     assertEquals(1, violations.size());
@@ -267,7 +267,7 @@ void shouldValidatePhoneNumberWhenBlank() {
     @Test
     void shouldValidateRoleWhenNull() {
         // Given
-        CustomerDto customerDto = CustomerDto.builder()
+        NewCustomerDto newCustomerDto = NewCustomerDto.builder()
                 .customerId(1)
                 .firstName("John")
                 .lastName("Doe")
@@ -278,7 +278,7 @@ void shouldValidatePhoneNumberWhenBlank() {
                 .build();
 
         // When
-        Set<ConstraintViolation<CustomerDto>> violations = validator.validate(customerDto);
+        Set<ConstraintViolation<NewCustomerDto>> violations = validator.validate(newCustomerDto);
 
         // Then
         assertEquals(1, violations.size());

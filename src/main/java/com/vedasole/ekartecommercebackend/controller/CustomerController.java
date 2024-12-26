@@ -4,6 +4,7 @@ import com.vedasole.ekartecommercebackend.exception.APIException;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.ApiResponse;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
+import com.vedasole.ekartecommercebackend.payload.NewCustomerDto;
 import com.vedasole.ekartecommercebackend.security.JwtService;
 import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
 import com.vedasole.ekartecommercebackend.service.service_interface.UserService;
@@ -50,27 +51,27 @@ public class CustomerController {
     /**
      * Creates a new customer.
      *
-     * @param customerDto the customer data to create
+     * @param newCustomerDto the customer data to create
      * @return a response with the created customer data and links to itself and the list of customers
      */
     @PostMapping
     public ResponseEntity<EntityModel<CustomerDto>> createCustomer(
-            @Valid @RequestBody CustomerDto customerDto
+            @Valid @RequestBody NewCustomerDto newCustomerDto
     ) {
-        log.debug("New Customer request received with email : {}", customerDto.getEmail());
-        log.debug("New Customer request received : {}", customerDto);
+        log.debug("New Customer request received with email : {}", newCustomerDto.getEmail());
+        log.debug("New Customer request received : {}", newCustomerDto);
         try {
-            this.customerService.getCustomerByEmail(customerDto.getEmail());
-            this.userService.getUserByEmail(customerDto.getEmail());
+            this.customerService.getCustomerByEmail(newCustomerDto.getEmail());
+            this.userService.getUserByEmail(newCustomerDto.getEmail());
         }catch(ResourceNotFoundException re) {
             log.debug("No customer with this email found");
         } catch (Exception e) {
             throw new APIException("A customer with this email already exists");
         }
 
-        CustomerDto createdCustomer = this.customerService.createCustomer(customerDto);
+        CustomerDto createdCustomer = this.customerService.createCustomer(newCustomerDto);
         log.debug("New Customer created : {}", createdCustomer.getEmail());
-        String jwt = this.jwtService.generateToken(this.userService.getUserByEmail(customerDto.getEmail()));
+        String jwt = this.jwtService.generateToken(this.userService.getUserByEmail(newCustomerDto.getEmail()));
         Link selfLink = linkTo(methodOn(CustomerController.class).getCustomer(createdCustomer.getCustomerId())).withSelfRel();
         Link customersLink = linkTo(methodOn(CustomerController.class).getAllCustomers()).withRel(CUSTOMERS.getValue());
         return ResponseEntity

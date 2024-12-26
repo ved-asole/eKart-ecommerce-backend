@@ -1,7 +1,7 @@
 package com.vedasole.ekartecommercebackend.utility;
 
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
-import com.vedasole.ekartecommercebackend.payload.CustomerDto;
+import com.vedasole.ekartecommercebackend.payload.NewCustomerDto;
 import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class ApplicationInitializer implements ApplicationListener<ApplicationRe
         try {
             customerService.getCustomerByEmail(adminEmail);
         } catch (ResourceNotFoundException e) {
-            CustomerDto adminUser = CustomerDto.builder()
+            NewCustomerDto adminUser = NewCustomerDto.builder()
                     .customerId(1)
                     .email(adminEmail)
                     .firstName("Admin")

@@ -6,6 +6,7 @@ import com.vedasole.ekartecommercebackend.entity.User;
 import com.vedasole.ekartecommercebackend.exception.APIException;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.CustomerDto;
+import com.vedasole.ekartecommercebackend.payload.NewCustomerDto;
 import com.vedasole.ekartecommercebackend.repository.CustomerRepo;
 import com.vedasole.ekartecommercebackend.repository.ShoppingCartRepo;
 import com.vedasole.ekartecommercebackend.repository.UserRepo;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService {
     /**
      * Creates a new customer and saves it to the database.
      *
-     * @param customerDto the customer data to be saved
+     * @param newCustomerDto the new customer data to be saved
      * @return the created customer with its ID and other details
      * @throws APIException if an error occurs while saving the customer
      */
@@ -62,12 +64,12 @@ public class CustomerServiceImpl implements CustomerService {
             @CacheEvict(value = "allCustomers", allEntries = true),
             @CacheEvict(value = "allCustomersPage", allEntries = true)
     })
-    public CustomerDto createCustomer(CustomerDto customerDto) {
+    public CustomerDto createCustomer(@Valid NewCustomerDto newCustomerDto) {
         // Create a new user with the role of USER
         User user = new User(
-                customerDto.getEmail(),
-                passwordEncoder.encode(customerDto.getPassword()),
-                customerDto.getRole() != null ? customerDto.getRole() : AppConstant.Role.USER
+                newCustomerDto.getEmail(),
+                passwordEncoder.encode(newCustomerDto.getPassword()),
+                newCustomerDto.getRole() != null ? newCustomerDto.getRole() : AppConstant.Role.USER
         );
         // Save the user to the database
         User newUser;
@@ -79,7 +81,7 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         // Create a new customer and set the user to the newly created user
-        Customer customer = dtoToCustomer(customerDto);
+        Customer customer = newCustomerDtoToCustomer(newCustomerDto);
         customer.setUser(newUser);
 
         // Save the customer to the database
@@ -93,7 +95,7 @@ public class CustomerServiceImpl implements CustomerService {
             newCustomer = this.customerRepo.save(newCustomer);
             log.debug("Customer saved with id : {}", newCustomer.getEmail());
         } catch (Exception e) {
-            log.error("Failed to save customer: {}", customerDto.getEmail());
+            log.error("Failed to save customer: {}", newCustomerDto.getEmail());
             throw new APIException("Failed to save customer");
         }
 
@@ -305,6 +307,19 @@ public class CustomerServiceImpl implements CustomerService {
     private Customer dtoToCustomer(CustomerDto customerDto){
         User user = new User(customerDto.getEmail(), customerDto.getPassword(), customerDto.getRole());
         Customer customer = this.modelMapper.map(customerDto, Customer.class);
+        customer.setUser(user);
+        return customer;
+    }
+
+    /**
+     * Maps a NewCustomerDto to a Customer.
+     *
+     * @param newCustomerDto the NewCustomerDto to be mapped
+     * @return the mapped Customer
+     */
+    private Customer newCustomerDtoToCustomer(NewCustomerDto newCustomerDto){
+        User user = new User(newCustomerDto.getEmail(), passwordEncoder.encode(newCustomerDto.getPassword()), newCustomerDto.getRole());
+        Customer customer = this.modelMapper.map(newCustomerDto, Customer.class);
         customer.setUser(user);
         return customer;
     }

@@ -1,7 +1,7 @@
 package com.vedasole.ekartecommercebackend.utility;
 
 import com.vedasole.ekartecommercebackend.entity.User;
-import com.vedasole.ekartecommercebackend.payload.CustomerDto;
+import com.vedasole.ekartecommercebackend.payload.NewCustomerDto;
 import com.vedasole.ekartecommercebackend.security.JwtService;
 import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
 import lombok.Getter;
@@ -64,7 +64,7 @@ public class TestApplicationInitializer extends ApplicationEventsTestExecutionLi
     }
 
     private void insertNormalUser() {
-        CustomerDto adminUser = CustomerDto.builder()
+        NewCustomerDto normalUser = NewCustomerDto.builder()
                     .customerId(2)
                     .email(normalUserEmail)
                     .firstName("Normal")
@@ -73,7 +73,7 @@ public class TestApplicationInitializer extends ApplicationEventsTestExecutionLi
                     .password(normalUserPassword)
                     .role(AppConstant.Role.USER)
                     .build();
-        customerService.createCustomer(adminUser);
+        customerService.createCustomer(normalUser);
     }
 
 }
