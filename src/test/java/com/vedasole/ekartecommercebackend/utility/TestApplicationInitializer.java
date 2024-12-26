@@ -64,14 +64,13 @@ public class TestApplicationInitializer extends ApplicationEventsTestExecutionLi
     }
 
     private void insertNormalUser() {
-        String userEmail = "normal-user@ekart.com";
         CustomerDto adminUser = CustomerDto.builder()
                     .customerId(2)
-                    .email(userEmail)
+                    .email(normalUserEmail)
                     .firstName("Normal")
                     .lastName("User")
                     .phoneNumber("1234567890")
-                    .password("normal-user-test-adminPassword")
+                    .password(normalUserPassword)
                     .role(AppConstant.Role.USER)
                     .build();
         customerService.createCustomer(adminUser);
