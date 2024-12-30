@@ -1,6 +1,7 @@
 package com.vedasole.ekartecommercebackend.utility;
 
 import com.vedasole.ekartecommercebackend.entity.User;
+import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
 import com.vedasole.ekartecommercebackend.payload.NewCustomerDto;
 import com.vedasole.ekartecommercebackend.security.JwtService;
 import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
@@ -42,9 +43,27 @@ public class TestApplicationInitializer extends ApplicationEventsTestExecutionLi
     @EventListener(ApplicationReadyEvent.class)
     public void generateTokens() {
         log.info("ApplicationReadyEvent triggered and generating tokens");
+        insertAdminUser();
         generateAdminToken();
         insertNormalUser();
         generateUserToken();
+    }
+
+    private void insertAdminUser() {
+        try {
+            customerService.getCustomerByEmail(adminEmail);
+        } catch (ResourceNotFoundException e) {
+            NewCustomerDto adminUser = NewCustomerDto.builder()
+                    .customerId(1)
+                    .email(adminEmail)
+                    .firstName("Admin")
+                    .lastName("User")
+                    .phoneNumber("1234567890")
+                    .password(adminPassword)
+                    .role(AppConstant.Role.ADMIN)
+                    .build();
+            customerService.createCustomer(adminUser);
+        }
     }
 
     private void generateAdminToken() {
