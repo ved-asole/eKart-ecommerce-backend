@@ -118,7 +118,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String token = UUID.randomUUID().toString();
 
         // Save the token with the user's email and an expiration time
-        PasswordResetToken resetToken = new PasswordResetToken(token, email, LocalDateTime.now().plusHours(1));
+        PasswordResetToken resetToken = new PasswordResetToken(token, email);
         passwordResetTokenRepo.save(resetToken);
 
         // Send email

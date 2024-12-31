@@ -31,10 +31,10 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
-    public PasswordResetToken(String token, String email, LocalDateTime expiryDate) {
+    public PasswordResetToken(String token, String email) {
         this.token = token;
         this.email = email;
-        this.expiryDate = expiryDate;
+        this.expiryDate = LocalDateTime.now().plusMinutes(30);
     }
 
 }
