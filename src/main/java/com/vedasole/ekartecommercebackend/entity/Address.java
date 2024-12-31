@@ -9,8 +9,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -28,31 +26,23 @@ public class Address {
     @SequenceGenerator(name = "address_seq", allocationSize = 0)
     private long addressId;
 
-    @NotNull
-    @Size(max = 100)
-    @Column(name = "add_line1")
+    @Column(name = "add_line1", length = 100, nullable = false)
     private String addLine1;
 
-    @Size(max = 100)
-    @Column(name = "add_line2")
+    @Column(name = "add_line2", length = 100)
     private String addLine2;
 
-    @NotNull
-    @Size(max = 50)
-    @Column(name = "city")
+
+    @Column(name = "city", length = 50, nullable = false)
     private String city;
 
-    @NotNull
-    @Size(max = 50)
-    @Column(name = "state")
+
+    @Column(name = "state", length = 50, nullable = false)
     private String state;
 
-    @NotNull
-    @Size(max = 50)
-    @Column(name = "country")
+    @Column(name = "country", length = 50, nullable = false)
     private String country;
 
-    @NotNull
     @Column(name = "postal_code", length = 10, nullable = false)
     private int postalCode;
 
