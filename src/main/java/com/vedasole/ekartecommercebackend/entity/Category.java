@@ -10,7 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
