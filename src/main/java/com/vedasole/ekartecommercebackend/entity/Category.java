@@ -10,7 +10,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
@@ -38,8 +37,6 @@ public class Category implements Serializable {
     @SequenceGenerator(name = "category_seq", allocationSize = 0)
     private long categoryId;
 
-    @NotNull
-    @NotBlank
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
@@ -53,7 +50,6 @@ public class Category implements Serializable {
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 
-    @NotNull
     @Column(name = "active", nullable = false)
     private boolean active;
 
