@@ -12,6 +12,7 @@ Access my site at **[ekart.vedasole.me](https://ekart.vedasole.me)**
 
 - [About The App](#about-the-app)
 - [Screenshots](#screenshots)
+- [ER Diagram](#er-diagram)
 - [Technologies](#technologies)
 - [Setup](#setup)
 - [Approach](#approach)
@@ -23,9 +24,27 @@ Ekart Ecommerce is an online e-commerce app which provides the facility for onli
 A backend API project for the eKart E-commerce website developed using Java and Spring Framework.
 
 # Screenshots: 📷
-<img src="https://raw.githubusercontent.com/ved-asole/eKart-ecommerce-backend/master/ekartdb-backend-ER-diagram.png" width="500" height="500" alt="Database Diagram"/>
 
-Will be added soon😊
+### 1) Home Page 🏠
+![Home Page](eKart_shopping_home.png)
+
+### 2) All Products 🛍️
+![All Products](eKart_shopping_all-products.png)
+
+### 3) Cart 🛒
+![Shopping Cart](eKart_shopping_cart.png)
+
+### 4) Orders 📦
+![Orders](eKart_shopping_orders.png)
+
+### 5) Admin Dashboard 📊
+![Admin Panel](eKart_shopping_admin-panel.png)
+
+### 6) Payment Gateway 💳
+![Payment Gateway](eKart_shopping_payment-gateway.png)
+
+# ER Diagram: 📊
+![Ekart Shopping ER Diagram](ekartdb-backend-ER-diagram.png)
 
 # Technologies: ☕️  ⚛️
 
