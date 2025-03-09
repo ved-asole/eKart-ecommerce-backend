@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   test-java:
     machine:
-      image: ubuntu-2204:2022.07
+      image: ubuntu-2404:current
     steps:
       - checkout
       - run:
@@ -35,7 +35,7 @@ jobs:
 
   deploy:
     machine:
-      image: ubuntu-2204:2022.07
+      image: ubuntu-2404:current
     steps:
       - checkout
       - run:
@@ -60,12 +60,12 @@ jobs:
       - save_cache:
           key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
           paths:
-              - ~/.m2/repository
+            - ~/.m2/repository
 
 workflows:
   build-and-test:
     jobs:
       - test-java
       - deploy:
-         requires:
-           - test-java
+          requires:
+            - test-java
