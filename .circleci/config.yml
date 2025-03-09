@@ -1,0 +1,71 @@
+# This config was automatically generated from your source code
+# Stacks detected: deps:java:.
+version: 2.1
+jobs:
+  test-java:
+    machine:
+      image: ubuntu-2204:2022.07.1
+    steps:
+      - checkout
+      - run:
+          name: Install Java
+          command: |
+            sudo apt update
+            sudo apt install -y openjdk-17-jdk
+      - run:
+          name: Install Maven
+          command: |
+            sudo apt install -y maven
+      - run:
+          name: Calculate cache key
+          command: |
+            find . -name 'pom.xml' | \
+                    sort | xargs cat > /tmp/CIRCLECI_CACHE_KEY
+      - restore_cache:
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+      - run:
+          name: Run Maven tests
+          command: mvn clean verify
+      - store_test_results:
+          path: target/surefire-reports
+      - save_cache:
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+          paths:
+            - ~/.m2/repository
+
+  deploy:
+    machine:
+      image: ubuntu-2004:202101-01
+    steps:
+      - checkout
+      - run:
+          name: Install Java
+          command: |
+            sudo apt update
+            sudo apt install -y openjdk-17-jdk
+      - run:
+          name: Install Maven
+          command: |
+            sudo apt install -y maven
+      - run:
+          name: Calculate cache key
+          command: |
+            find . -name 'pom.xml' | \
+                    sort | xargs cat > /tmp/CIRCLECI_CACHE_KEY
+      - restore_cache:
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+      - run:
+          name: Run Maven Build
+          command: mvn clean install -DskipTests
+      - save_cache:
+          key: cache-{{ checksum "/tmp/CIRCLECI_CACHE_KEY" }}
+          paths:
+              - ~/.m2/repository
+
+workflows:
+  build-and-test:
+    jobs:
+      - test-java
+      - deploy:
+         requires:
+           - test-java
