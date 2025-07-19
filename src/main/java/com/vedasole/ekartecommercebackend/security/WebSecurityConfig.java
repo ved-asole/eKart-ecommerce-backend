@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
@@ -33,24 +33,21 @@ public class WebSecurityConfig {
             "/api/v1/",
             "/api/v1/auth/*",
             "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/api/v2/**",
-            "/v2/api-docs/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
             "/h2-console/**"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf()
-                .disable()
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                                 .antMatchers(HttpMethod.POST, "/api/v1/customers").permitAll()
-                                 .antMatchers(HttpMethod.POST, WEBHOOK_URL).permitAll()
-                                 .antMatchers(PUBLIC_URLS).permitAll()
-                                 .antMatchers(HttpMethod.GET).permitAll()
-                                .anyRequest()
-                                 .authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/customers").permitAll()
+                        .requestMatchers(HttpMethod.POST, WEBHOOK_URL).permitAll()
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(this.jwtAuthenticationEntryPoint)
@@ -60,10 +57,9 @@ public class WebSecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin().disable()
-                .cors()
-                .and()
-                .headers().frameOptions().disable();
+                .formLogin(formLogin -> formLogin.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         return http.build();
     }

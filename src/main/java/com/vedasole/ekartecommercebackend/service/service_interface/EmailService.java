@@ -1,9 +1,8 @@
 package com.vedasole.ekartecommercebackend.service.service_interface;
 
+import jakarta.mail.MessagingException;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
-
-import javax.mail.MessagingException;
 
 @Service
 public interface EmailService {
