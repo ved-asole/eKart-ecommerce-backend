@@ -11,6 +11,9 @@ on:
       - master
       - develop
 
+permissions:
+  contents: read
+
 env:
   jsonSecretKey: 'fakeSecretKey'
   frontendDomainUrl: 'http://localhost:5173'
