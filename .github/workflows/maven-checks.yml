@@ -69,6 +69,3 @@ jobs:
 
       - name: Run tests
         run: mvn test
-
-      - name: Update dependency graph
-        uses: advanced-security/maven-dependency-submission-action@v5.0.0
