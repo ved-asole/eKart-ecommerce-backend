@@ -32,20 +32,18 @@ class ShoppingCartRepoTest {
         // Initialize the database for testing
 
         //Add Customer
-        Customer customer = new Customer(
-                1L,
-                "John",
-                "Doe",
-                "1234567890",
-                "john@email.com",
-                new User("john@email.com", "password", AppConstant.Role.USER),
-                null,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+        Customer customer = Customer.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .phoneNumber("1234567890")
+                .email("john@email.com")
+                .user(new User("john@email.com", "password", AppConstant.Role.USER))
+                .shoppingCart(null)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         Customer savedCustomer = customerRepo.save(customer);
         ShoppingCart shoppingCart = ShoppingCart.builder()
-                .cartId(5)
                 .customer(savedCustomer)
                 .total(0)
                 .discount(0).build();

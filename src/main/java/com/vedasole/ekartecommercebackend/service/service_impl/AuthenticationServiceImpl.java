@@ -13,6 +13,8 @@ import com.vedasole.ekartecommercebackend.service.service_interface.Authenticati
 import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
 import com.vedasole.ekartecommercebackend.service.service_interface.EmailService;
 import com.vedasole.ekartecommercebackend.service.service_interface.UserService;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

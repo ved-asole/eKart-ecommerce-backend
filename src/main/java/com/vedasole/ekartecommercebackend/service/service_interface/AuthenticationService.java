@@ -2,9 +2,8 @@ package com.vedasole.ekartecommercebackend.service.service_interface;
 
 import com.vedasole.ekartecommercebackend.payload.AuthenticationRequest;
 import com.vedasole.ekartecommercebackend.payload.AuthenticationResponse;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This interface defines the methods for authentication-related operations.

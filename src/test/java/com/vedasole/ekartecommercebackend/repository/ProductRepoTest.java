@@ -28,52 +28,65 @@ class ProductRepoTest {
     @BeforeEach
     void setUp() {
 
-        Category category1 = new Category(1L, "Category 1", "cat_img1.jpg", "Description 1", null, true, LocalDateTime.now(), LocalDateTime.now());
-        Category category2 = new Category(2L, "Category 2", "cat_img2.jpg", "Description 2", null, true, LocalDateTime.now(), LocalDateTime.now());
+        Category category1 = Category.builder()
+                .name("Category 1")
+                .image("cat_img1.jpg")
+                .desc("Description 1")
+                .parentCategory(null)
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Category category2 = Category.builder()
+                .name("Category 2")
+                .image("cat_img2.jpg")
+                .desc("Description 2")
+                .parentCategory(null)
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
 
         category1 = categoryRepo.save(category1);
         category2 = categoryRepo.save(category2);
 
         // Initialize the products in the database
-        Product product1 = new Product(
-                1L,
-                "Sample Product Name 1 containing word car",
-                "img1.jpg",
-                "PRD-001",
-                "Sample Description to test same description methods with word : apple",
-                100.0,
-                10,
-                50,
-                category1,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
-        Product product2 = new Product(
-                2L,
-                "Product 2",
-                "img2.jpg",
-                "PRD-002",
-                "Description 2",
-                200.0,
-                20,
-                40,
-                category1,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
-        Product product3 = new Product(
-                3L,
-                "Sample Product Name 3 containing word car",
-                "img3.jpg",
-                "PRD-003",
-                "Sample Description to test same description methods with word : apple",
-                300.0,
-                30,
-                30,
-                category2,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+        Product product1 = Product.builder()
+                .name("Sample Product Name 1 containing word car")
+                .image("img1.jpg")
+                .sku("PRD-001")
+                .desc("Sample Description to test same description methods with word : apple")
+                .price(100.0)
+                .qtyInStock(10)
+                .discount(50)
+                .category(category1)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Product product2 = Product.builder()
+                .name("Product 2")
+                .image("img2.jpg")
+                .sku("PRD-002")
+                .desc("Description 2")
+                .price(200.0)
+                .qtyInStock(20)
+                .discount(40)
+                .category(category1)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Product product3 = Product.builder()
+                .name("Sample Product Name 3 containing word car")
+                .image("img3.jpg")
+                .sku("PRD-003")
+                .desc("Sample Description to test same description methods with word : apple")
+                .price(300.0)
+                .qtyInStock(30)
+                .discount(30)
+                .category(category2)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         underTest.saveAll(List.of(product1, product2, product3));
     }
 

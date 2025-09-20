@@ -12,6 +12,8 @@ import com.vedasole.ekartecommercebackend.repository.ShoppingCartRepo;
 import com.vedasole.ekartecommercebackend.repository.UserRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.CustomerService;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
+import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -26,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
