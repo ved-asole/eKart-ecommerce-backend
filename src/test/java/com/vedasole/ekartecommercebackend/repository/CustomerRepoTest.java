@@ -29,17 +29,16 @@ class CustomerRepoTest {
         //given
         String email = "johndoe@email.com";
         new ShoppingCart();
-        Customer customer = new Customer(
-                1L,
-                "John",
-                "Doe",
-                "1234567890",
-                email,
-                new User(email, "password", AppConstant.Role.USER),
-                null,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+        Customer customer = Customer.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .phoneNumber("1234567890")
+                .email(email)
+                .user(new User(email, "password", AppConstant.Role.USER))
+                .shoppingCart(null)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         underTest.save(customer);
     }
 

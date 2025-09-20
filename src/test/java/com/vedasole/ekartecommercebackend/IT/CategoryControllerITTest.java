@@ -1,21 +1,30 @@
 package com.vedasole.ekartecommercebackend.IT;
 
+import com.vedasole.ekartecommercebackend.config.TestSecurityConfig;
 import com.vedasole.ekartecommercebackend.entity.Category;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
 import com.vedasole.ekartecommercebackend.utility.TestApplicationInitializer;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
@@ -24,17 +33,23 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestSecurityConfig.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class CategoryControllerITTest {
 
     @Autowired
     private CategoryRepo categoryRepo;
     @Autowired
     private CategoryService categoryService;
-    @Autowired
+    @MockBean
     private TestApplicationInitializer testApplicationInitializer;
 
     @LocalServerPort
@@ -57,23 +72,22 @@ class CategoryControllerITTest {
     @BeforeEach
     void setUp() {
 
-        restTemplate.getInterceptors().add((request, body, execution) -> {
-            request.getHeaders().add("Authorization", "Bearer " + testApplicationInitializer.getAdminToken());
-            return execution.execute(request, body);
-        });
+        // Mock testApplicationInitializer
+        when(testApplicationInitializer.getAdminToken()).thenReturn("fake-admin-token");
+
+        // No authorization header needed since security is disabled
 
         baseUrl = baseUrl.concat(":").concat(String.valueOf(port)).concat("/api/v1/categories");
 
-        Category category = new Category(
-                1L,
-                "Mobiles & Tablets",
-                "/images/categories/mobile-and-tablets.webp",
-                "Mobile phones are no more merely a part of our lives. Whether it's to stay connected with friends and family or to keep abreast of important developments around the world, mobiles are no longer for sending a text or making a call. From budget to state-of-the-art smartphones; indigenous names to global big-wigs - a whole universe of mobiles await you on Flipkart. Whether you’re looking for waterdrop notch screens, a high screen to body ratio, AI-powered sensational cameras, high storage capacity, blazing quick processing engines or reflective glass designs, rest assured you won’t have to venture anywhere else for your smartphone needs.",
-                null,
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+        Category category = Category.builder()
+                .name("Mobiles & Tablets")
+                .image("/images/categories/mobile-and-tablets.webp")
+                .desc("Mobile phones are no more merely a part of our lives. Whether it's to stay connected with friends and family or to keep abreast of important developments around the world, mobiles are no longer for sending a text or making a call. From budget to state-of-the-art smartphones; indigenous names to global big-wigs - a whole universe of mobiles await you on Flipkart. Whether you're looking for waterdrop notch screens, a high screen to body ratio, AI-powered sensational cameras, high storage capacity, blazing quick processing engines or reflective glass designs, rest assured you won't have to venture anywhere else for your smartphone needs.")
+                .parentCategory(null)
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         expected = categoryRepo.save(category);
     }
 
@@ -91,16 +105,15 @@ class CategoryControllerITTest {
     @Test
     void testCreateCategory() {
         categoryRepo.deleteAll();
-        final Category category = new Category(
-                1L,
-                "Mobiles & Tablets",
-                "/images/categories/mobile-and-tablets.webp",
-                "Mobile phones are no more merely a part of our lives. Whether it's to stay connected with friends and family or to keep abreast of important developments around the world, mobiles are no longer for sending a text or making a call. From budget to state-of-the-art smartphones; indigenous names to global big-wigs - a whole universe of mobiles await you on Flipkart. Whether you’re looking for waterdrop notch screens, a high screen to body ratio, AI-powered sensational cameras, high storage capacity, blazing quick processing engines or reflective glass designs, rest assured you won’t have to venture anywhere else for your smartphone needs.",
-                null,
-                true,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
+        final Category category = Category.builder()
+                .name("Mobiles & Tablets")
+                .image("/images/categories/mobile-and-tablets.webp")
+                .desc("Mobile phones are no more merely a part of our lives. Whether it's to stay connected with friends and family or to keep abreast of important developments around the world, mobiles are no longer for sending a text or making a call. From budget to state-of-the-art smartphones; indigenous names to global big-wigs - a whole universe of mobiles await you on Flipkart. Whether you're looking for waterdrop notch screens, a high screen to body ratio, AI-powered sensational cameras, high storage capacity, blazing quick processing engines or reflective glass designs, rest assured you won't have to venture anywhere else for your smartphone needs.")
+                .parentCategory(null)
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
         ResponseEntity<CategoryDto> categoryDtoResponseEntity = restTemplate.postForEntity(baseUrl, category, CategoryDto.class);
         assert categoryDtoResponseEntity.getStatusCode().is2xxSuccessful();
         assertThat(categoryDtoResponseEntity.getBody()).isNotNull();

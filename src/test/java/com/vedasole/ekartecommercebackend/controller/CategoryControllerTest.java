@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,7 +48,7 @@ class CategoryControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
+    @MockBean
     private TestApplicationInitializer testApplicationInitializer;
 
     private Category expected;
@@ -54,6 +56,9 @@ class CategoryControllerTest {
     @BeforeEach
     void setUp() {
         baseUrl = baseUrl.concat(":").concat(String.valueOf(port)).concat("/api/v1/categories");
+
+        // Mock testApplicationInitializer
+        when(testApplicationInitializer.getAdminToken()).thenReturn("fake-admin-token");
 
         expected = new Category(
                 1L,
@@ -73,6 +78,7 @@ class CategoryControllerTest {
      * @throws Exception If any error occurs during the test.
      */
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void testCreateCategory() throws Exception {
         //given
         given(categoryService.createCategory(convertToCategoryDto(expected))).willReturn(convertToCategoryDto(expected));
@@ -80,7 +86,6 @@ class CategoryControllerTest {
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(baseUrl)
                         .accept(MediaType.APPLICATION_JSON)
-                        .header("Authorization","Bearer ".concat(testApplicationInitializer.getAdminToken()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(convertToCategoryDto(expected)))
                 )
@@ -95,6 +100,7 @@ class CategoryControllerTest {
      * @throws Exception If any error occurs during the test.
      */
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void updateCategory() throws Exception {
         // Set the updated values for the expected category
         expected.setName("Electronics");
@@ -108,7 +114,6 @@ class CategoryControllerTest {
         ResultActions resultActions = mockMvc.perform(
                         put(baseUrl.concat("/").concat(String.valueOf(expected.getCategoryId())))
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization","Bearer ".concat(testApplicationInitializer.getAdminToken()))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(convertToCategoryDto(expected)))
                 )
@@ -122,12 +127,12 @@ class CategoryControllerTest {
      * @throws Exception If any error occurs during the test.
      */
     @Test
+    @WithMockUser(authorities = "ROLE_ADMIN")
     void deleteCategory() throws Exception {
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.delete(baseUrl.concat("/").concat(String.valueOf(expected.getCategoryId())))
                                 .accept(MediaType.APPLICATION_JSON)
-                                .header("Authorization", "Bearer ".concat(testApplicationInitializer.getAdminToken()))
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 // then
