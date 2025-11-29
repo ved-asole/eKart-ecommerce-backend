@@ -22,7 +22,7 @@ import javax.validation.Valid;
 @RequestMapping("/api/v1/payment")
 @CrossOrigin(value = {
         "http://localhost:5173",
-        "https://ekart.vedasole.me",
+        "https://ekart.vedasole.cloud",
         "https://ekart-shopping.netlify.app",
         "https://develop--ekart-shopping.netlify.app"
 }, allowCredentials = "true")

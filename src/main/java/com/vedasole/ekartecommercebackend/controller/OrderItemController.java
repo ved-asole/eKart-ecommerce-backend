@@ -19,7 +19,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/v1/order/{orderId}/items")
 @CrossOrigin(value = {
         "http://localhost:5173",
-        "https://ekart.vedasole.me",
+        "https://ekart.vedasole.cloud",
         "https://ekart-shopping.netlify.app",
         "https://develop--ekart-shopping.netlify.app"
 }, allowCredentials = "true")

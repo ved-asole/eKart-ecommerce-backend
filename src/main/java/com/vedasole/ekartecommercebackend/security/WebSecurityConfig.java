@@ -73,7 +73,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
-                "https://ekart.vedasole.me",
+                "https://ekart.vedasole.cloud",
                 "https://ekart-shopping.netlify.app",
                 "https://develop--ekart-shopping.netlify.app"
         ));
