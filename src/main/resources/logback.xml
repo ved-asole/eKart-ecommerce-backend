@@ -3,6 +3,7 @@
     <appender name="Logtail" class="com.logtail.logback.LogtailAppender">
         <appName>ekart_logs</appName>
         <sourceToken>${logtailSourceToken}</sourceToken>
+        <ingestUrl>https://s996098.eu-fsn-3.betterstackdata.com</ingestUrl >
         <mdcFields>requestId,requestTime</mdcFields>
         <mdcTypes>string,int</mdcTypes>
         <objectMapperModule>com.fasterxml.jackson.datatype.jsr310.JavaTimeModule</objectMapperModule>
