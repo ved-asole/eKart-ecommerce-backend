@@ -33,6 +33,7 @@ public class EkartEcommerceBackendApplication {
     public void onApplicationReady() {
         log.info("EkartEcommerceBackendApplication started \uD83D\uDE80");
         log.info("Application name: {}, Port:{}", appName, environment.getProperty("local.server.port"));
+        log.info("Cors allowed origins: {}", environment.getProperty("cors.allowed.origins"));
     }
 
 }
