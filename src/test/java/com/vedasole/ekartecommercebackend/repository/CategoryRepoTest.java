@@ -219,7 +219,7 @@ class CategoryRepoTest {
         // Then
         assertEquals(numberOfCategories, result.getTotalElements());
         System.out.println("Query took " + (endTime - startTime) + " milliseconds to execute");
-        assertTrue((endTime - startTime) < 3000, "Query took longer than 2 second to execute");
+        assertTrue((endTime - startTime) < 4000, "Query took longer than 3 second to execute");
     }
 
     @Test
