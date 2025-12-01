@@ -20,12 +20,6 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/payment")
-@CrossOrigin(value = {
-        "http://localhost:5173",
-        "https://ekart.vedasole.cloud",
-        "https://ekart-shopping.netlify.app",
-        "https://develop--ekart-shopping.netlify.app"
-}, allowCredentials = "true")
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentController {

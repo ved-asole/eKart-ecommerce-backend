@@ -3,6 +3,7 @@ package com.vedasole.ekartecommercebackend.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -14,9 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +26,7 @@ public class WebSecurityConfig {
     private final JWTAuthenticationFilter jwtAuthFilter;
     private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final AuthenticationProvider authenticationProvider;
+    private final Environment env;
     private static final String WEBHOOK_URL = "/api/v1/payment/webhook/*";
 
     private static final String[] PUBLIC_URLS = {
@@ -44,13 +44,16 @@ public class WebSecurityConfig {
         http
                 .csrf()
                 .disable()
+                .cors()
+                .and()
                 .authorizeHttpRequests(auth -> auth
-                                 .antMatchers(HttpMethod.POST, "/api/v1/customers").permitAll()
-                                 .antMatchers(HttpMethod.POST, WEBHOOK_URL).permitAll()
-                                 .antMatchers(PUBLIC_URLS).permitAll()
-                                 .antMatchers(HttpMethod.GET).permitAll()
-                                .anyRequest()
-                                 .authenticated()
+                        .antMatchers(HttpMethod.POST, "/api/v1/customers").permitAll()
+                        .antMatchers(HttpMethod.POST, WEBHOOK_URL).permitAll()
+                        .antMatchers(PUBLIC_URLS).permitAll()
+                        .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                        .antMatchers(HttpMethod.GET).permitAll()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(this.jwtAuthenticationEntryPoint)
@@ -61,8 +64,6 @@ public class WebSecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin().disable()
-                .cors()
-                .and()
                 .headers().frameOptions().disable();
 
         return http.build();
@@ -70,24 +71,36 @@ public class WebSecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "https://ekart.vedasole.cloud",
-                "https://ekart-shopping.netlify.app",
-                "https://develop--ekart-shopping.netlify.app"
-        ));
-        configuration.setAllowedMethods(Arrays.asList(
+        CorsConfiguration config = new CorsConfiguration();
+                String origins = env.getProperty("cors.allowed.origins");
+        System.out.println("CORS origins from properties: " + origins);
+
+        if (origins == null || origins.trim().isEmpty()) {
+            throw new IllegalStateException(
+                    "CORS allowed origins property `cors.allowed.origins` must be configured when credentials are enabled."
+            );
+        }
+        for (String o : origins.split(",")) {
+            config.addAllowedOrigin(o.trim());
+        }
+        config.setAllowedMethods(Arrays.asList(
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
                 HttpMethod.PUT.name(),
-                HttpMethod.DELETE.name()
+                HttpMethod.DELETE.name(),
+                HttpMethod.OPTIONS.name()
         ));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.addExposedHeader("Authorization");
-        configuration.setAllowCredentials(true);
+                config.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept"
+        ));
+        config.addExposedHeader("Authorization");
+        config.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
