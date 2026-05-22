@@ -14,6 +14,7 @@ import com.vedasole.ekartecommercebackend.repository.AddressRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.*;
 import com.vedasole.ekartecommercebackend.utility.AppConstant;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 
-import javax.mail.MessagingException;
 import java.util.Map;
 
 @Service

@@ -3,6 +3,7 @@ package com.vedasole.ekartecommercebackend.controller;
 import com.vedasole.ekartecommercebackend.payload.ApiResponse;
 import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 

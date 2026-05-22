@@ -1,17 +1,15 @@
 package com.vedasole.ekartecommercebackend.entity;
 
 import com.vedasole.ekartecommercebackend.utility.AppConstant.OrderStatus;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,11 +55,9 @@ public class Order {
     private OrderStatus orderStatus;
 
     @Column(name = "create_dt", nullable = false, updatable = false)
-    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "update_dt")
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     public Order(long orderId, Customer customer, List<OrderItem> orderItems, Address address, double total, OrderStatus orderStatus) {
@@ -84,6 +80,10 @@ public class Order {
     @PrePersist
     @PreUpdate
     private void onPersistOrUpdate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        this.updatedAt = LocalDateTime.now();
         calculateTotal();
     }
 

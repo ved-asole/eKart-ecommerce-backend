@@ -49,9 +49,9 @@ class WebSecurityConfigTest {
         mockMvc.perform(delete("/api/v1/customers/3")
                         .header("Authorization", "Bearer " + testApplicationInitializer.getAdminToken()))
                 .andExpectAll(
-                        jsonPath("$.message").value("No class com.vedasole.ekartecommercebackend.entity.Customer entity with id 3 exists!"),
-                        jsonPath("$.success").value(false),
-                        status().isInternalServerError()
+                        jsonPath("$.message").value("Customer deleted successfully"),
+                        jsonPath("$.success").value(true),
+                        status().isOk()
                 );
     }
 

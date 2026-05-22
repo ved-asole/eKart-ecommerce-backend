@@ -3,6 +3,9 @@ package com.vedasole.ekartecommercebackend.controller;
 import com.vedasole.ekartecommercebackend.payload.ApiResponse;
 import com.vedasole.ekartecommercebackend.payload.ProductDto;
 import com.vedasole.ekartecommercebackend.service.service_interface.ProductService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
@@ -12,9 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CATEGORY;

@@ -3,15 +3,15 @@ package com.vedasole.ekartecommercebackend.payload;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vedasole.ekartecommercebackend.entity.Order;
 import com.vedasole.ekartecommercebackend.utility.AppConstant.OrderStatus;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;

@@ -2,16 +2,15 @@ package com.vedasole.ekartecommercebackend.controller;
 
 import com.vedasole.ekartecommercebackend.payload.*;
 import com.vedasole.ekartecommercebackend.service.service_interface.AuthenticationService;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 /**
  * Controller for handling authentication related requests.

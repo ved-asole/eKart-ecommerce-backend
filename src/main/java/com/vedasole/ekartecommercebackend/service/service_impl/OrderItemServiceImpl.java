@@ -9,12 +9,12 @@ import com.vedasole.ekartecommercebackend.payload.ShoppingCartItemDto;
 import com.vedasole.ekartecommercebackend.repository.OrderItemRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.OrderItemService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.ORDER_DETAIL;

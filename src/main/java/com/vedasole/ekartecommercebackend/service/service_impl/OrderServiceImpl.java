@@ -5,6 +5,7 @@ import com.vedasole.ekartecommercebackend.entity.Customer;
 import com.vedasole.ekartecommercebackend.entity.Order;
 import com.vedasole.ekartecommercebackend.entity.OrderItem;
 import com.vedasole.ekartecommercebackend.exception.ResourceNotFoundException;
+import com.vedasole.ekartecommercebackend.payload.MonthlyIncomeDto;
 import com.vedasole.ekartecommercebackend.payload.OrderDto;
 import com.vedasole.ekartecommercebackend.repository.CustomerRepo;
 import com.vedasole.ekartecommercebackend.repository.OrderItemRepo;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.CUSTOMER;
 import static com.vedasole.ekartecommercebackend.utility.AppConstant.RELATIONS.ORDER;
@@ -211,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Map<String, Double>> getTotalIncomeByMonth() {
+    public List<MonthlyIncomeDto> getTotalIncomeByMonth() {
         return this.orderRepo.getTotalIncomeByMonth();
     }
 

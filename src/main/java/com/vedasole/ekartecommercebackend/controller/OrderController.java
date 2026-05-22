@@ -1,7 +1,9 @@
 package com.vedasole.ekartecommercebackend.controller;
 
+import com.vedasole.ekartecommercebackend.payload.MonthlyIncomeDto;
 import com.vedasole.ekartecommercebackend.payload.OrderDto;
 import com.vedasole.ekartecommercebackend.service.service_interface.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
@@ -10,9 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -124,7 +124,7 @@ public class OrderController {
     }
 
     @GetMapping("/income-by-month")
-    public ResponseEntity<List<Map<String, Double>>> getTotalIncomeByMonth() {
+    public ResponseEntity<List<MonthlyIncomeDto>> getTotalIncomeByMonth() {
         return ResponseEntity.ok(orderService.getTotalIncomeByMonth());
     }
 

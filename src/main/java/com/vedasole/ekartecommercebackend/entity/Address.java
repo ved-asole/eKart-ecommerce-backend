@@ -1,5 +1,6 @@
 package com.vedasole.ekartecommercebackend.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
