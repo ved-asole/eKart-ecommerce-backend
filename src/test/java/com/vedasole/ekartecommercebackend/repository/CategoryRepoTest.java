@@ -202,7 +202,7 @@ class CategoryRepoTest {
     @Test
     void shouldHandleLargeNumberOfCategoriesEfficiently() {
         // Given
-        int numberOfCategories = 10000;
+        int numberOfCategories = 5000;
         List<Category> categories = new ArrayList<>();
         for (int i = 0; i < numberOfCategories; i++) {
             Category category = new Category();
@@ -219,7 +219,7 @@ class CategoryRepoTest {
         // Then
         assertEquals(numberOfCategories, result.getTotalElements());
         System.out.println("Query took " + (endTime - startTime) + " milliseconds to execute");
-        assertTrue((endTime - startTime) < 4000, "Query took longer than 3 second to execute");
+        assertTrue((endTime - startTime) < 2000, "Query took longer than 3 second to execute");
     }
 
     @Test
