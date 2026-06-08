@@ -55,6 +55,8 @@ A backend API project for the eKart E-commerce website developed using Java and 
 - Spring Data JPA
 - H2 and Postgres DB
 - Swagger
+- AWS (Amazon Web Services)
+- GCP (Google Cloud Services)
 
 # Setup: 💻
 
