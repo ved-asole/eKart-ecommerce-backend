@@ -5,24 +5,18 @@ import com.vedasole.ekartecommercebackend.payload.CategoryDto;
 import com.vedasole.ekartecommercebackend.repository.CategoryRepo;
 import com.vedasole.ekartecommercebackend.service.service_interface.CategoryService;
 import com.vedasole.ekartecommercebackend.utility.TestApplicationInitializer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
+import org.springframework.hateoas.config.HypermediaRestTemplateConfigurer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,9 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @AutoConfigureMockMvc
@@ -48,28 +40,26 @@ class CategoryControllerITTest {
     private CategoryRepo categoryRepo;
     @Autowired
     private CategoryService categoryService;
-    @MockBean
+    @MockitoBean
     private TestApplicationInitializer testApplicationInitializer;
+
+    @Autowired
+    private HypermediaRestTemplateConfigurer hypermediaRestTemplateConfigurer;
 
     @LocalServerPort
     private int port;
-    private static RestTemplate restTemplate;
+    private RestTemplate restTemplate;
     private String baseUrl="http://localhost";
     private Category expected;
-
-    @BeforeAll
-    static void init() {
-        restTemplate = new RestTemplate();
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.getObjectMapper().registerModule(new Jackson2HalModule());
-        restTemplate.getMessageConverters().add(0, converter);
-    }
 
     /**
      * This method is responsible for setting up the test environment before each test method is executed.
      */
     @BeforeEach
     void setUp() {
+
+        // Configure a RestTemplate with HAL hypermedia support
+        restTemplate = hypermediaRestTemplateConfigurer.registerHypermediaTypes(new RestTemplate());
 
         // Mock testApplicationInitializer
         when(testApplicationInitializer.getAdminToken()).thenReturn("fake-admin-token");
