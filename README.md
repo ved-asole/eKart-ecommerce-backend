@@ -6,7 +6,9 @@
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ved-asole_eKart-ecommerce-backend&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=ved-asole_eKart-ecommerce-backend)
 
 # Live Link / Demo Link: 🔗
-Access my site at **[ekart.vedasole.cloud](https://ekart.vedasole.cloud)**
+Access my site at **[ekart.vedasole.cloud](https://ekart.vedasole.cloud)** <br> <br>
+Fronted at: **[github.com/ved-asole/eKart-ecommerce-app](https://github.com/ved-asole/eKart-ecommerce-app)** <br>
+Backend at: **[github.com/ved-asole/eKart-ecommerce-backend](https://github.com/ved-asole/eKart-ecommerce-backend)**
 
 # Table of Content: 📑
 
